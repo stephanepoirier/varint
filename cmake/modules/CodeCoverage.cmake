@@ -117,6 +117,8 @@ FUNCTION(SETUP_TARGET_FOR_COVERAGE _targetname _outputname)
 		# Merge baseline and test coverage info
 		COMMAND ${LCOV_PATH} -a ${initial_info} -a ${test_info} -o ${all_info}
 
+		COMMAND ${LCOV_PATH} --remove ${all_info} "/external/*" -o ${all_info}
+
 		COMMAND ${GENHTML_PATH} -o ${_outputname} ${all_info} # Generate HTML
 
 		# Cleanup intermediate files
