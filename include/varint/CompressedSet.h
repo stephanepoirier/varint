@@ -15,15 +15,16 @@
 //BLOCK_INDEX_SHIFT_BITS = i;
 #define BLOCK_INDEX_SHIFT_BITS 11
 
-#include <utility>
-#include "Common.h"
-#include "Set.h"
-#include "DeltaChunkStore.h"
-#include "CompressedDeltaChunk.h"
 #include "Codec.h"
+#include "CompressedDeltaChunk.h"
+#include "DeltaChunkStore.h"
+#include "Set.h"
+
 #include "bitpacking/memutil.h"
 
-using namespace std;
+#include <istream>
+#include <ostream>
+#include <utility>
 
 class CompressedSet;
 
@@ -31,7 +32,7 @@ class CompressedSet : public Set {
   private:
     int sizeOfCurrentNoCompBlock;  // the number of uncompressed elements that is hold in the currentNoCompBlock
     // Two separate arrays containing the last docID of each block in words in uncompressed form.
-    vector<unsigned int> baseListForOnlyCompBlocks;
+    std::vector<unsigned int> baseListForOnlyCompBlocks;
 
     const CompressedSet& operator=(const CompressedSet& other);
 
@@ -43,8 +44,8 @@ class CompressedSet : public Set {
         int totalDocIdNum;
 
         int compBlockNum;  // the number of compressed blocks
-        vector<uint32_t, AlignedSTLAllocator<uint32_t, 64>> iterDecompBlock;
-        vector<uint32_t, AlignedSTLAllocator<uint32_t, 64>> currentNoCompBlock;
+        std::vector<uint32_t, AlignedSTLAllocator<uint32_t, 64>> iterDecompBlock;
+        std::vector<uint32_t, AlignedSTLAllocator<uint32_t, 64>> currentNoCompBlock;
 
         const CompressedSet* set;  // parent
         int advanceToTargetInTheFollowingCompBlocks(int target, int startBlockIndex);
@@ -69,7 +70,7 @@ class CompressedSet : public Set {
     unsigned int totalDocIdNum;  // the total number of elemnts that have been inserted/accessed so far
 
     // Memory used to store uncompressed elements. Once the block is full, all its elements are compressed into sequencOfCompBlock and the block is cleared.
-    vector<uint32_t, AlignedSTLAllocator<uint32_t, 64>> currentNoCompBlock;
+    std::vector<uint32_t, AlignedSTLAllocator<uint32_t, 64>> currentNoCompBlock;
 
     DeltaChunkStore sequenceOfCompBlocks;  // Store for list compressed delta chunk
 
@@ -78,10 +79,10 @@ class CompressedSet : public Set {
     ~CompressedSet();
 
     /**
-      * Swap the content of this bitmap with another bitmap.
-      * without having to pay the cost of one copy constructor call
-      * and two assignment operator call.
-      */
+     * Swap the content of this bitmap with another bitmap.
+     * without having to pay the cost of one copy constructor call
+     * and two assignment operator call.
+     */
 
     inline void swap(CompressedSet& x) throw() {  // No throw exception guarantee
       using std::swap;
@@ -94,21 +95,21 @@ class CompressedSet : public Set {
 
     friend void swap(CompressedSet& lhs, CompressedSet& rhs) noexcept { lhs.swap(rhs); }
 
-    void write(ostream& out);
-    void read(istream& in);
-    shared_ptr<Set::Iterator> iterator() const;
+    void write(std::ostream& out);
+    void read(std::istream& in);
+    std::shared_ptr<Set::Iterator> iterator() const;
 
     /**
-       * Add an array of sorted docIds to the set
-       */
+     * Add an array of sorted docIds to the set
+     */
     void addDocs(unsigned int docids[], size_t start, size_t len);
 
     /**
-       * Add document to this set
-       * Note that you must set the bits in increasing order:
-       * addDoc(1), addDoc(2) is ok;
-       * addDoc(2), addDoc(1) is not ok.
-       */
+     * Add document to this set
+     * Note that you must set the bits in increasing order:
+     * addDoc(1), addDoc(2) is ok;
+     * addDoc(2), addDoc(1) is not ok.
+     */
     void addDoc(unsigned int docId);
 
     CompressedSet unorderedAdd(unsigned int docId);
@@ -117,24 +118,24 @@ class CompressedSet : public Set {
     void compactBaseListForOnlyCompBlocks();
     void compact();
     void initSet();
-    const shared_ptr<CompressedDeltaChunk> PForDeltaCompressOneBlock(unsigned int* block,
+    const std::shared_ptr<CompressedDeltaChunk> PForDeltaCompressOneBlock(unsigned int* block,
                                                                      size_t blocksize);
-    const shared_ptr<CompressedDeltaChunk> PForDeltaCompressCurrentBlock();
+    const std::shared_ptr<CompressedDeltaChunk> PForDeltaCompressCurrentBlock();
 
     /**
-       * Gets the number of ids in the set
-       * @return docset size
-       */
+     * Gets the number of ids in the set
+     * @return docset size
+     */
     unsigned int size() const;
 
     /**
-       * if more then 1/8 of bit are set to 1 in range [minSetValue,maxSetvalue]
-       * you should use EWAHBoolArray compression instead
-       * because this compression will take at least 8 bits by positions
-       */
+     * if more then 1/8 of bit are set to 1 in range [minSetValue,maxSetvalue]
+     * you should use EWAHBoolArray compression instead
+     * because this compression will take at least 8 bits by positions
+     */
     bool isDense();
 
-    //This method will not work after a call to flush()
+    // This method will not work after a call to flush()
     bool find(unsigned int target) const;
 };
 

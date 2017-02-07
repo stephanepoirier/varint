@@ -10,6 +10,8 @@
 
 #include "common.h"
 
+#include <limits>
+
 
 template<class T, size_t alignment>
 T * moveToBoundary(T * inbyte) {

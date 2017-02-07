@@ -9,9 +9,8 @@
 #ifndef BITPACK_UTIL
 #define BITPACK_UTIL
 #include "common.h"
-#include <iostream> // for std::cerr 
 
-using namespace std;
+#include <iostream> // for std::cerr
 
 // taken from stackoverflow
 #ifndef NDEBUG

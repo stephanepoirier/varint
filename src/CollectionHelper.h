@@ -1,13 +1,15 @@
 #ifndef COLLECTION_HELPER_H__
 #define COLLECTION_HELPER_H__
 
+#include <vector>
+
 /**
  * Binary search for the first element that is equal to or larger than the target
  *
  * @param in must be sorted and contains no duplicates
  * @return the index of the first element in the array that is equal or larger than the target. -1 if the target is out of range.
  */
-int binarySearchForFirstElementEqualOrLargerThanTarget(const vector<unsigned int>& in, int start,
+int binarySearchForFirstElementEqualOrLargerThanTarget(const std::vector<unsigned int>& in, int start,
                                                        int end, unsigned int target) {
   int mid;
   while (start < end) {
@@ -53,7 +55,7 @@ int binarySearchForFirstElementEqualOrLargerThanTarget(const unsigned int* in, i
  *  Binary search in the base list for the block that may contain
  *  docId greater than or equal to the target
  */
-int binarySearchInBaseListForBlockThatMayContainTarget(const vector<unsigned int>& in, int start,
+int binarySearchInBaseListForBlockThatMayContainTarget(const std::vector<unsigned int>& in, int start,
                                                        int end, int target) {
   //the baseListForOnlyCompBlocks (in) contains all last elements of the compressed blocks.
   return binarySearchForFirstElementEqualOrLargerThanTarget(in, start, end, target);
@@ -65,7 +67,7 @@ int binarySearchInBaseListForBlockThatMayContainTarget(const vector<unsigned int
  * @param vals must be sorted
  * @return the index of the target in the input array. -1 if the target is out of range.
  */
-int binarySearchForTarget(vector<unsigned int>& vals, int start, int end, unsigned int target) {
+int binarySearchForTarget(std::vector<unsigned int>& vals, int start, int end, unsigned int target) {
   int mid;
   while (start <= end) {
     mid = (start + end) / 2;

@@ -1,38 +1,44 @@
 #ifndef DELTA_CHUNK_STORE_H__
 #define DELTA_CHUNK_STORE_H__
 
-#include <vector>
-#include <iostream>
-#include <unordered_map>
-#include <memory>
 #include "CompressedDeltaChunk.h"
 
-using namespace std;
+#include <istream>
+#include <ostream>
+#include <memory>
+#include <unordered_map>
+#include <vector>
 
 class DeltaChunkStore {
   private:
-    vector<shared_ptr<CompressedDeltaChunk> > data2;
+    std::vector<std::shared_ptr<CompressedDeltaChunk> > data2;
 
   public:
     DeltaChunkStore() {}
 
-    shared_ptr<CompressedDeltaChunk> allocateBlock(size_t compressedSize) {
-      shared_ptr<CompressedDeltaChunk> compblock(new CompressedDeltaChunk(compressedSize));
+    std::shared_ptr<CompressedDeltaChunk> allocateBlock(size_t compressedSize) {
+      std::shared_ptr<CompressedDeltaChunk> compblock(new CompressedDeltaChunk(compressedSize));
       return compblock;
     }
 
-    void add(const shared_ptr<CompressedDeltaChunk>& val) { data2.push_back(val); }
+    void add(const std::shared_ptr<CompressedDeltaChunk>& val) {
+      data2.push_back(val);
+    }
 
-    const CompressedDeltaChunk& get(int index) const { return *data2[index]; }
+    const CompressedDeltaChunk& get(int index) const {
+      return *data2[index];
+    }
 
     void compact() {
       if (data2.size() != data2.capacity()) {
-        vector<shared_ptr<CompressedDeltaChunk> > tmp = data2;
+        std::vector<std::shared_ptr<CompressedDeltaChunk> > tmp = data2;
         std::swap(data2, tmp);
       }
     }
 
-    size_t size() const { return data2.size(); }
+    size_t size() const {
+      return data2.size();
+    }
 
     int getSerialIntNum() const {
       int num = 1;  // _len
@@ -42,7 +48,7 @@ class DeltaChunkStore {
       return num;
     }
 
-    void write(ostream& out) const {
+    void write(std::ostream& out) const {
       int size = data2.size();
       out.write((char*)&size, 4);
 
@@ -51,19 +57,18 @@ class DeltaChunkStore {
       }
     }
 
-    void read(istream& in) {
+    void read(std::istream& in) {
       int size = 0;
       in.read((char*)&size, 4);
       data2.clear();
       for (int i = 0; i < size; i++) {
-        shared_ptr<CompressedDeltaChunk> compblock(new CompressedDeltaChunk(in));
+        std::shared_ptr<CompressedDeltaChunk> compblock(new CompressedDeltaChunk(in));
         data2.push_back(compblock);
       }
     }
 
     inline void swap(DeltaChunkStore& x) throw() {  // No throw exception guarantee
-      using std::swap;
-      swap(this->data2, x.data2);
+      std::swap(this->data2, x.data2);
     }
 
     friend void swap(DeltaChunkStore& lhs, DeltaChunkStore& rhs) noexcept { lhs.swap(rhs); }

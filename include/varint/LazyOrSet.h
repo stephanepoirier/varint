@@ -4,29 +4,32 @@
 #ifndef LAZY_OR_SET_H__
 #define LAZY_OR_SET_H__
 
-#include "CompressedSet.h"
+#include "Set.h"
+
+#include <memory>
+#include <vector>
 
 class LazyOrSetIterator : public Set::Iterator {
   private:
     class Item {
       public:
-        shared_ptr<Set::Iterator> iter;
+        std::shared_ptr<Set::Iterator> iter;
         unsigned int doc;
-        Item(shared_ptr<Set::Iterator> it) {
+        Item(std::shared_ptr<Set::Iterator> it) {
           iter = it;
           doc = 0;
         }
     };
-    
+
     unsigned _curDoc;
-    vector<shared_ptr<Item>> _heap;
+    std::vector<std::shared_ptr<Item>> _heap;
     int _size;
 
     void heapRemoveRoot();
     void heapAdjust();
 
   public:
-    LazyOrSetIterator(vector<shared_ptr<Set>> sets);
+    LazyOrSetIterator(std::vector<std::shared_ptr<Set>> sets);
 
     unsigned int docID();
     unsigned int nextDoc();
@@ -36,13 +39,13 @@ class LazyOrSetIterator : public Set::Iterator {
 class LazyOrSet : public Set {
   private:
     const int INVALID = -1;
-    vector<shared_ptr<Set>> sets;
+    std::vector<std::shared_ptr<Set>> sets;
     mutable int _size = INVALID;
 
   public:
-    LazyOrSet(vector<shared_ptr<Set>> docSets);
-    LazyOrSet(shared_ptr<Set>& left, shared_ptr<Set>& right);
-    shared_ptr<Set::Iterator> iterator() const;
+    LazyOrSet(std::vector<std::shared_ptr<Set>> docSets);
+    LazyOrSet(std::shared_ptr<Set>& left, std::shared_ptr<Set>& right);
+    std::shared_ptr<Set::Iterator> iterator() const;
 
     unsigned int size() const; //Override
 

@@ -1,15 +1,18 @@
-#include <vector>
-#include "varint/Set.h"
 #include "varint/LazyAndSet.h"
 
+#include "varint/Set.h"
+
+#include <memory>
+#include <vector>
+
 LazyAndSet::LazyAndSet() {
-  sets_ = vector<shared_ptr<Set> >();
+  sets_ = std::vector<std::shared_ptr<Set> >();
   nonNullSize = 0;
   setSize = 0;
   init = false;
 }
 
-LazyAndSet::LazyAndSet(shared_ptr<Set>& left, shared_ptr<Set>& right) {
+LazyAndSet::LazyAndSet(std::shared_ptr<Set>& left, std::shared_ptr<Set>& right) {
   sets_.push_back(left);
   sets_.push_back(right);
   nonNullSize = sets_.size();
@@ -17,7 +20,7 @@ LazyAndSet::LazyAndSet(shared_ptr<Set>& left, shared_ptr<Set>& right) {
   init = false;
 }
 
-LazyAndSet::LazyAndSet(vector<shared_ptr<Set> >& sets) {
+LazyAndSet::LazyAndSet(std::vector<std::shared_ptr<Set> >& sets) {
   sets_ = sets;
   nonNullSize = sets.size();
   setSize = 0;
@@ -44,8 +47,8 @@ unsigned int LazyAndSet::size() const {
   return setSize;
 }
 
-shared_ptr<Set::Iterator> LazyAndSet::iterator() const {
-  shared_ptr<Set::Iterator> it(new LazyAndSetIterator(this));
+std::shared_ptr<Set::Iterator> LazyAndSet::iterator() const {
+  std::shared_ptr<Set::Iterator> it(new LazyAndSetIterator(this));
   return it;
 }
 
@@ -55,10 +58,10 @@ LazyAndSetIterator::LazyAndSetIterator(const LazyAndSet* parent) : set(*parent) 
     return;
   }
 
-  for (vector<shared_ptr<Set> >::const_iterator it = set.sets_.begin(); it != set.sets_.end();
+  for (std::vector<std::shared_ptr<Set>>::const_iterator it = set.sets_.begin(); it != set.sets_.end();
        it++) {
-    shared_ptr<Set> set = *it;
-    shared_ptr<Set::Iterator> dcit = set->iterator();
+    std::shared_ptr<Set> set = *it;
+    std::shared_ptr<Set::Iterator> dcit = set->iterator();
     iterators.push_back(dcit);
   }
   lastReturn = 0;
@@ -70,7 +73,7 @@ unsigned int LazyAndSetIterator::nextDoc() {
   // DAAT
   if (lastReturn == NO_MORE_DOCS) return NO_MORE_DOCS;
 
-  shared_ptr<Set::Iterator> dcit = iterators[0];
+  std::shared_ptr<Set::Iterator> dcit = iterators[0];
   unsigned target = dcit->nextDoc();
 
   // shortcut: if it reaches the end of the shortest list, do not scan other lists
@@ -113,7 +116,7 @@ unsigned int LazyAndSetIterator::nextDoc() {
 unsigned int LazyAndSetIterator::Advance(unsigned int target) {
   if (lastReturn == NO_MORE_DOCS) return NO_MORE_DOCS;
 
-  shared_ptr<Set::Iterator> dcit = iterators[0];
+  std::shared_ptr<Set::Iterator> dcit = iterators[0];
   target = dcit->Advance(target);
   if (target == NO_MORE_DOCS) {
     return (lastReturn = target);

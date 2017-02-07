@@ -2,11 +2,8 @@
 #ifndef SINK_H__
 #define SINK_H__
 
-#include <iostream>
 #include <stdio.h>
 #include <memory.h>
-
-using namespace std;
 
 class Sink {
   private:
@@ -51,7 +48,9 @@ class Sink {
       return true;
     }
 
-    size_t spaceLeft() { return limit_ - currBytePtr; }
+    size_t spaceLeft() {
+      return limit_ - currBytePtr;
+    }
     // Returns a writable buffer of the specified length for appending.
     // May return a pointer to the caller-owned scratch buffer which
     // must have at least the indicated length.  The returned buffer is

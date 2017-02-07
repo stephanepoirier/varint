@@ -1,14 +1,21 @@
 #include "varint/LazyOrSet.h"
 
-LazyOrSet::LazyOrSet(vector<shared_ptr<Set>> docSets) { sets = docSets; }
+#include "varint/Set.h"
 
-LazyOrSet::LazyOrSet(shared_ptr<Set>& left, shared_ptr<Set>& right) {
+#include <memory>
+#include <vector>
+
+LazyOrSet::LazyOrSet(std::vector<std::shared_ptr<Set>> docSets) {
+  sets = docSets;
+}
+
+LazyOrSet::LazyOrSet(std::shared_ptr<Set>& left, std::shared_ptr<Set>& right) {
   sets.push_back(left);
   sets.push_back(right);
 }
 
-shared_ptr<Set::Iterator> LazyOrSet::iterator() const {
-  shared_ptr<Set::Iterator> it(new LazyOrSetIterator(sets));
+std::shared_ptr<Set::Iterator> LazyOrSet::iterator() const {
+  std::shared_ptr<Set::Iterator> it(new LazyOrSetIterator(sets));
   return it;
 }
 
@@ -27,11 +34,11 @@ bool LazyOrSet::find(unsigned int val) const {
   return docid != NO_MORE_DOCS && docid == val;
 }
 
-LazyOrSetIterator::LazyOrSetIterator(vector<shared_ptr<Set>> sets) {
+LazyOrSetIterator::LazyOrSetIterator(std::vector<std::shared_ptr<Set>> sets) {
   _curDoc = 0;
   _size = sets.size();
   for (auto set : sets) {
-    _heap.push_back(shared_ptr<Item>(new Item(set->iterator())));
+    _heap.push_back(std::shared_ptr<Item>(new Item(set->iterator())));
   }
   if (_size == 0) {
     _curDoc = NO_MORE_DOCS;
@@ -45,9 +52,9 @@ unsigned int LazyOrSetIterator::nextDoc() {
     return NO_MORE_DOCS;
   }
 
-  shared_ptr<Item> top = _heap[0];
+  std::shared_ptr<Item> top = _heap[0];
   while (true) {
-    shared_ptr<Set::Iterator> topIter = top->iter;
+    std::shared_ptr<Set::Iterator> topIter = top->iter;
     unsigned int docid;
     if ((docid = topIter->nextDoc()) != NO_MORE_DOCS) {
       top->doc = docid;
@@ -75,9 +82,9 @@ unsigned int LazyOrSetIterator::Advance(unsigned int target) {
     target = _curDoc + 1;
   }
 
-  shared_ptr<Item> top = _heap[0];
+  std::shared_ptr<Item> top = _heap[0];
   while (true) {
-    shared_ptr<Set::Iterator> topIter = top->iter;
+    std::shared_ptr<Set::Iterator> topIter = top->iter;
     unsigned int docid;
     if ((docid = topIter->Advance(target)) != NO_MORE_DOCS) {
       top->doc = docid;
@@ -100,7 +107,7 @@ unsigned int LazyOrSetIterator::Advance(unsigned int target) {
 void LazyOrSetIterator::heapRemoveRoot() {
   _size--;
   if (_size > 0) {
-    shared_ptr<Item> tmp = _heap[0];
+    std::shared_ptr<Item> tmp = _heap[0];
     _heap[0] = _heap[_size];
     _heap[_size] = tmp;  // keep the finished iterator at the end for debugging
     heapAdjust();
@@ -112,7 +119,7 @@ void LazyOrSetIterator::heapRemoveRoot() {
  * Bubble the root down as required to make the subtree a heap.
  */
 void LazyOrSetIterator::heapAdjust() {
-  shared_ptr<Item> top = _heap[0];
+  std::shared_ptr<Item> top = _heap[0];
   int doc = top->doc;
   int size = _size;
   int i = 0;
@@ -121,12 +128,12 @@ void LazyOrSetIterator::heapAdjust() {
     int lchild = (i << 1) + 1;
     if (lchild >= size) break;
 
-    shared_ptr<Item> left = _heap[lchild];
+    std::shared_ptr<Item> left = _heap[lchild];
     int ldoc = left->doc;
 
     int rchild = lchild + 1;
     if (rchild < size) {
-      shared_ptr<Item> right = _heap[rchild];
+      std::shared_ptr<Item> right = _heap[rchild];
       int rdoc = right->doc;
 
       if (rdoc <= ldoc) {

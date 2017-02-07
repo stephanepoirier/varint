@@ -7,9 +7,12 @@
 #ifndef BITPACK_COMPOSITECODEC_H_
 #define BITPACK_COMPOSITECODEC_H_
 
+#include "codecs.h"
 #include "common.h"
 #include "util.h"
-#include "codecs.h"
+
+#include <sstream>
+#include <string>
 
 /**
  * This is a useful class for CODEC that only compress
@@ -58,7 +61,7 @@ public:
         assert(initin + length >= in2);
         return in2;
     }
-    
+
     __inline__ size_t compressedSize(const uint32_t *in, const size_t length) const {
         const size_t roundedlength = length / Codec1::BlockSize * Codec1::BlockSize;
         size_t nbytes = codec1.compressedSize(in,length);
@@ -71,8 +74,8 @@ public:
 
     }
 
-    string name() const {
-        ostringstream convert;
+    std::string name() const {
+        std::ostringstream convert;
         convert << codec1.name() << "+" << codec2.name();
         return convert.str();
     }

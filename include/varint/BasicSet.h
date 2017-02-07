@@ -2,17 +2,19 @@
 #define BASIC_SET_H__
 
 #include "Set.h"
-#include <set>
-#include <limits>
 
-using namespace std;
+#include <istream>
+#include <limits>
+#include <ostream>
+#include <set>
+#include <stddef.h>
 
 class BasicSet;
 
 class BasicSet : public Set {
   private:
     const BasicSet& operator=(const BasicSet& other);
-    set<unsigned int> docs;
+    std::set<unsigned int> docs;
 
   public:
     BasicSet();
@@ -21,7 +23,7 @@ class BasicSet : public Set {
 
     class Iterator : public Set::Iterator {
       private:
-        set<unsigned int>::iterator cursor;
+        std::set<unsigned int>::iterator cursor;
         const BasicSet* set;  // parent
         bool init = false;
 
@@ -42,9 +44,9 @@ class BasicSet : public Set {
   	 */
     void swap(BasicSet& x);
 
-    void write(ostream& out);
-    void read(istream& in);
-    shared_ptr<Set::Iterator> iterator() const;
+    void write(std::ostream& out);
+    void read(std::istream& in);
+    std::shared_ptr<Set::Iterator> iterator() const;
 
     /**
   	 * Add document to this set
@@ -54,7 +56,7 @@ class BasicSet : public Set {
   	 */
     void addDoc(unsigned int docId);
     void addDocs(unsigned int* docids, size_t start, size_t len);
-    
+
     BasicSet unorderedAdd(unsigned int docId);
     void removeDocId(unsigned int docId);
     BasicSet removeDoc(unsigned int docId);

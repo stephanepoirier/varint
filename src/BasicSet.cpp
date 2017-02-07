@@ -1,31 +1,35 @@
-#include <iostream>
-#include <stdio.h>
-#include <assert.h>
-#include <vector>
-#include <memory>
-#include <algorithm>
-
 #include "varint/BasicSet.h"
 
-BasicSet::BasicSet(const BasicSet& other) { docs = other.docs; }
+#include <assert.h>
+#include <istream>
+#include <memory>
+#include <ostream>
+#include <stdio.h>
+#include <vector>
+
+BasicSet::BasicSet(const BasicSet& other) {
+  docs = other.docs;
+}
 BasicSet::BasicSet() {}
 BasicSet::~BasicSet() {}
 
 /**
-  * Swap the content of this bitmap with another bitmap.
-  * No copying is done. (Running time complexity is constant.)
-  */
-void BasicSet::swap(BasicSet& x) { assert(false); }
+ * Swap the content of this bitmap with another bitmap.
+ * No copying is done. (Running time complexity is constant.)
+ */
+void BasicSet::swap(BasicSet& x) {
+  assert(false);
+}
 
-void BasicSet::write(ostream& out) {
+void BasicSet::write(std::ostream& out) {
   for (auto val : docs) {
     out << val << " ";
   }
 }
 
-void BasicSet::read(istream& in) {
+void BasicSet::read(std::istream& in) {
   docs.clear();
-  set<unsigned int>().swap(docs);
+  std::set<unsigned int>().swap(docs);
 
   unsigned int docId;
   while (in >> docId) {
@@ -33,8 +37,8 @@ void BasicSet::read(istream& in) {
   }
 }
 
-shared_ptr<Set::Iterator> BasicSet::iterator() const {
-  shared_ptr<Set::Iterator> it = make_shared<BasicSet::Iterator>(this);
+std::shared_ptr<Set::Iterator> BasicSet::iterator() const {
+  std::shared_ptr<Set::Iterator> it = std::make_shared<BasicSet::Iterator>(this);
   return it;
 }
 
@@ -73,10 +77,13 @@ void BasicSet::compact() {}
  * Gets the number of ids in the set
  * @return docset size
  */
-unsigned int BasicSet::size() const { return docs.size(); }
+unsigned int BasicSet::size() const {
+  return docs.size();
+}
 
 inline bool BasicSet::find(unsigned int target) const {
-  if (docs.find(target) != docs.end()) return true;
+  if (docs.find(target) != docs.end())
+    return true;
 
   return false;
 }

@@ -5,7 +5,7 @@
 #include <set>
 #include <iostream>
 
-void testvec(set<unsigned int>& data) {
+void testvec(std::set<unsigned int>& data) {
   std::stringstream ss;
 
   CompressedSet myset2;

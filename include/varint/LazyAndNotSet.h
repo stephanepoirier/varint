@@ -2,15 +2,16 @@
 #define LAZY_AND_NOT_SET_H__
 
 #include "Set.h"
-#include "CompressedSet.h"
+
+#include <memory>
 
 class LazyAndNotSet;
 
 class LazyAndNotSetIterator : public Set::Iterator {
   private:
     unsigned int _nextDelDoc;
-    shared_ptr<Set::Iterator> _baseIter;
-    shared_ptr<Set::Iterator> _notIter;
+    std::shared_ptr<Set::Iterator> _baseIter;
+    std::shared_ptr<Set::Iterator> _notIter;
     int _currID;
 
   public:
@@ -57,8 +58,8 @@ class LazyAndNotSetIterator : public Set::Iterator {
 
 class LazyAndNotSet : public Set {
   private:
-    shared_ptr<Set> _baseSet;
-    shared_ptr<Set> _notSet;
+    std::shared_ptr<Set> _baseSet;
+    std::shared_ptr<Set> _notSet;
     mutable unsigned int setSize;
     mutable bool init = false;
 
@@ -81,15 +82,16 @@ class LazyAndNotSet : public Set {
       if (!init) {
         LazyAndNotSetIterator dcit(_baseSet->iterator(), _notSet->iterator());
         setSize = 0;
-        while (dcit.nextDoc() != NO_MORE_DOCS) setSize++;
+        while (dcit.nextDoc() != NO_MORE_DOCS)
+          setSize++;
       }
       init = true;
       return setSize;
     }
 
-    shared_ptr<Set::Iterator> iterator() const {
-      shared_ptr<Set::Iterator> it =
-          make_shared<LazyAndNotSetIterator>(_baseSet->iterator(), _notSet->iterator());
+    std::shared_ptr<Set::Iterator> iterator() const {
+      std::shared_ptr<Set::Iterator> it =
+          std::make_shared<LazyAndNotSetIterator>(_baseSet->iterator(), _notSet->iterator());
       return it;
     }
 };

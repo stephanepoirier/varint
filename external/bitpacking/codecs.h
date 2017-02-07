@@ -11,6 +11,10 @@
 
 #include "common.h"
 #include "util.h"
+
+#include <string>
+#include <vector>
+
 class NotEnoughStorage: public std::runtime_error {
 public:
     size_t required;// number of 32-bit symbols required
@@ -65,8 +69,8 @@ public:
      *
      * This is offered for convenience. It might be slow.
      */
-    virtual vector<uint32_t> compress(const vector<uint32_t> & data) {
-        vector < uint32_t > compresseddata(4*data.size() + 2048 + 64);// allocate plenty of memory
+    virtual std::vector<uint32_t> compress(const std::vector<uint32_t> & data) {
+        std::vector < uint32_t > compresseddata(4*data.size() + 2048 + 64);// allocate plenty of memory
         size_t memavailable = compresseddata.size();
         encodeArray(&data[0], data.size(), &compresseddata[0], memavailable);
         compresseddata.resize(memavailable);
@@ -84,10 +88,10 @@ public:
      *
      * For convenience. Might be slow.
      */
-    virtual vector<uint32_t> uncompress(
-            const vector<uint32_t> & compresseddata,
+    virtual std::vector<uint32_t> uncompress(
+            const std::vector<uint32_t> & compresseddata,
             size_t expected_uncompressed_size = 0) {
-        vector < uint32_t> data(expected_uncompressed_size);// allocate plenty of memory
+        std::vector < uint32_t> data(expected_uncompressed_size);// allocate plenty of memory
         size_t memavailable = data.size();
         try {
             decodeArray(&compresseddata[0], compresseddata.size(), &data[0],
@@ -102,7 +106,7 @@ public:
         return data;
     }
 
-    virtual string name() const = 0;
+    virtual std::string name() const = 0;
 };
 
 /******************
@@ -129,7 +133,7 @@ public:
         nvalue = length;
         return in + length;
     }
-    string name() const {
+    std::string name() const {
         return "JustCopy";
     }
 };

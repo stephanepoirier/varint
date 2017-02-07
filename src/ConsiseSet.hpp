@@ -29,7 +29,7 @@ class ConciseSet {
   	 * Note that literal words 0xFFFFFFFF and 0x80000000 are allowed, thus
   	 * zero-length sequences (i.e., such that getSequenceCount() == 0) cannot exists.
   	 */
-    vector<unsigned int> words;
+    std::vector<unsigned int> words;
 
     /**
   	 * Most significant set bit within the uncompressed bit string.

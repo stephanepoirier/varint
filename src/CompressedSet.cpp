@@ -1,14 +1,20 @@
-#include <iostream>
-#include <stdio.h>
-#include <assert.h>
-#include "varint/Source.h"
-#include "varint/Sink.h"
-#include <vector>
-#include <memory>
-#include "CollectionHelper.h"
 #include "varint/CompressedSet.h"
 
+#include "CollectionHelper.h"
+
+#include "varint/Source.h"
+
+#include <assert.h>
+#include <istream>
+#include <memory>
+#include <ostream>
+#include <stdio.h>
+#include <vector>
+
+using namespace std;
+
 Codec CompressedSet::codec;
+
 CompressedSet::CompressedSet(const CompressedSet& other)
     : currentNoCompBlock(DEFAULT_BATCH_SIZE, 0) {
   // You are trying to copy the bitmap, a terrible idea in general, for performance reasons
@@ -185,7 +191,7 @@ void CompressedSet::removeDocId(unsigned int docId) {
 
 void CompressedSet::compactBaseListForOnlyCompBlocks() {
   if (baseListForOnlyCompBlocks.size() != baseListForOnlyCompBlocks.capacity()) {
-    vector<unsigned int> tmp(baseListForOnlyCompBlocks);
+    std::vector<unsigned int> tmp(baseListForOnlyCompBlocks);
     std::swap(baseListForOnlyCompBlocks, tmp);
   }
 }
@@ -234,7 +240,7 @@ bool CompressedSet::isDense() {
 
 //This method will not work after a call to flush()
 inline bool CompressedSet::find(unsigned int target) const {
-  vector<uint32_t, AlignedSTLAllocator<uint32_t, 64>> myDecompBlock(DEFAULT_BATCH_SIZE, 0);
+  std::vector<uint32_t, AlignedSTLAllocator<uint32_t, 64>> myDecompBlock(DEFAULT_BATCH_SIZE, 0);
   if (PREDICT_FALSE(totalDocIdNum == 0)) return false;
   if (sizeOfCurrentNoCompBlock != 0) {
     if (sizeOfCurrentNoCompBlock > 0 && target > currentNoCompBlock[sizeOfCurrentNoCompBlock - 1]) {

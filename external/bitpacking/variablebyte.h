@@ -7,8 +7,11 @@
 
 #ifndef VARIABLEBYTE_H_
 #define VARIABLEBYTE_H_
+
 #include "common.h"
 #include "codecs.h"
+
+#include <string>
 
 class VariableByte: public IntegerCODEC {
 public:
@@ -120,7 +123,7 @@ public:
     	*out = ((in[4] & 0x7FU) << 28) | *out;
     	return 5;
     }
-    
+
     const uint32_t * decodeArray(const uint32_t *in, const size_t length,
             uint32_t *out, size_t & nvalue) const {
         if (length == 0) {
@@ -131,13 +134,13 @@ public:
         const uint8_t * const endbyte = reinterpret_cast<const uint8_t *> (in
                         + length);
         const uint32_t * const initout(out);
-        
+
         // this assumes that there is a value to be read
         while (endbyte > inbyte + 5) {
         	inbyte += read_int(inbyte,out);
         	++out;
         }
-        
+
         while (endbyte > inbyte) {
             unsigned int shift = 0;
 
@@ -154,7 +157,7 @@ public:
         return in + length;
     }
 
-    string name() const {
+    std::string name() const {
         return "VariableByte";
     }
 

@@ -1,9 +1,12 @@
 #include "varint/CompressedDeltaChunk.h"
-#include <vector>
+
 #include "varint/Common.h"
 #include "varint/Sink.h"
 #include "varint/Source.h"
+
 #include "bitpacking/memutil.h"
+
+#include <vector>
 
 template <class T>
 __attribute__((const)) bool needPaddingTo128Bits(const T* inbyte) {
@@ -19,7 +22,7 @@ CompressedDeltaChunk::CompressedDeltaChunk(size_t compressedSize) : data_(compre
   assert(!needPaddingTo128Bits(&data_[0]));
 }
 
-CompressedDeltaChunk::CompressedDeltaChunk(istream& in) : compressedSize_(0) {
+CompressedDeltaChunk::CompressedDeltaChunk(std::istream& in) : compressedSize_(0) {
   in.read((char*)&compressedSize_, 4);
   data_.resize(compressedSize_);
   in.read((char*)&(data_[0]), compressedSize_);
@@ -29,12 +32,12 @@ CompressedDeltaChunk::CompressedDeltaChunk(istream& in) : compressedSize_(0) {
 void CompressedDeltaChunk::resize(size_t newsize) {
   compressedSize_ = newsize;
   data_.resize(newsize);
-  vector<uint8, cacheallocator> tmp(data_);
+  std::vector<uint8, cacheallocator> tmp(data_);
   std::swap(data_, tmp);
   assert(!needPaddingTo128Bits(&data_[0]));
 }
 
-vector<uint8, cacheallocator>& CompressedDeltaChunk::getVector() { return data_; }
+std::vector<uint8, cacheallocator>& CompressedDeltaChunk::getVector() { return data_; }
 
 CompressedDeltaChunk::~CompressedDeltaChunk() {}
 
@@ -46,7 +49,7 @@ Source CompressedDeltaChunk::getSource() const {
   return Source((char*)&(data_[0]), compressedSize_);
 }
 
-void CompressedDeltaChunk::write(ostream& out) const {
+void CompressedDeltaChunk::write(std::ostream& out) const {
   out.write((char*)&compressedSize_, 4);
   out.write((char*)&(data_[0]), compressedSize_);
 }

@@ -1,14 +1,20 @@
 #ifndef COMPRESSED_DELTA_CHUNK_H__
 #define COMPRESSED_DELTA_CHUNK_H__
-#include <vector>
+
 #include "Common.h"
 #include "Sink.h"
 #include "Source.h"
+
 #include "bitpacking/memutil.h"
+
+#include <istream>
+#include <ostream>
+#include <stddef.h>
+#include <vector>
 
 class CompressedDeltaChunk {
   private:
-    vector<uint8, cacheallocator> data_;
+    std::vector<uint8, cacheallocator> data_;
     size_t compressedSize_;
 
     //disable copy constructor
@@ -18,15 +24,15 @@ class CompressedDeltaChunk {
   public:
     CompressedDeltaChunk();
     CompressedDeltaChunk(size_t compressedSize);
-    CompressedDeltaChunk(istream& in);
+    CompressedDeltaChunk(std::istream& in);
     ~CompressedDeltaChunk();
 
     void resize(size_t newsize);
-    vector<uint8, cacheallocator>& getVector();
+    std::vector<uint8, cacheallocator>& getVector();
     size_t getCompressedSize();
     Sink getSink();
     Source getSource() const;
-    void write(ostream& out) const;
+    void write(std::ostream& out) const;
 
     inline void swap(CompressedDeltaChunk& x) throw() {
       using std::swap;

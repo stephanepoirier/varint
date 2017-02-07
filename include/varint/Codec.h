@@ -1,15 +1,18 @@
 #ifndef CODEC_H__
 #define CODEC_H__
 
-#include "bitpacking/compositecodec.h"
-#include "bitpacking/simdbinarypacking.h"
-#include "bitpacking/variablebyte.h"
-#include "Source.h"
-#include "Sink.h"
 #include "CompressedDeltaChunk.h"
-#include "bitpacking/util.h"
+#include "Source.h"
 
-using namespace std;
+#include "bitpacking/compositecodec.h"
+#include "bitpacking/memutil.h"
+#include "bitpacking/simdbinarypacking.h"
+#include "bitpacking/util.h"
+#include "bitpacking/variablebyte.h"
+
+#include <memory>
+#include <stddef.h>
+#include <vector>
 
 class Codec {
   private:
@@ -23,12 +26,12 @@ class Codec {
      * @return the compressed size in bytes
      */
     template <typename srctype>
-    __inline__ shared_ptr<CompressedDeltaChunk> Compress(const srctype src, size_t srcSize) const {
+    __inline__ std::shared_ptr<CompressedDeltaChunk> Compress(const srctype src, size_t srcSize) const {
       assert(!needPaddingTo128Bits(src));
       size_t nbyte = codec.compressedSize((const uint32_t*)src, (sizeof(*src) * srcSize) / 4);
-      shared_ptr<CompressedDeltaChunk> compblock(new CompressedDeltaChunk(nbyte));
+      std::shared_ptr<CompressedDeltaChunk> compblock(new CompressedDeltaChunk(nbyte));
 
-      vector<uint8, cacheallocator>& v = compblock->getVector();
+      std::vector<uint8, cacheallocator>& v = compblock->getVector();
       assert(!needPaddingTo128Bits(&v[0]));
       size_t memavailable = v.size() / 4;
       codec.encodeArray((const uint32_t*)src, (sizeof(*src) * srcSize) / 4, (uint32_t*)&v[0],

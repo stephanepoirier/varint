@@ -1,9 +1,10 @@
 #ifndef ABSTRACT_SET_H__
 #define ABSTRACT_SET_H__
 
-#include <memory>
+#include <istream>
 #include <limits>
-#include <iostream>
+#include <ostream>
+#include <memory>
 
 const unsigned int NO_MORE_DOCS = std::numeric_limits<unsigned int>::max();
 
@@ -19,7 +20,7 @@ class Set {
 
         virtual ~Iterator(){};
     };
-    
+
     virtual std::shared_ptr<Iterator> iterator() const = 0;
     virtual unsigned int size() const = 0;
 
