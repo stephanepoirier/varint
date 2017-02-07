@@ -1,126 +1,127 @@
 /**
  * This is CONCISE: COmpressed 'N' Composable Integer SET.
- * internally represented by compressed bitmaps 
+ * internally represented by compressed bitmaps
  * though a RLE (Run-Length Encoding) compression algorithm.
  * see http://ricerca.mat.uniroma3.it/users/colanton/docs/concise.pdf for detail.
  */
 #ifndef CONCISE_SET_H__
 #define CONCISE_SET_H__
+
 #include <vector>
 
 class ConciseSet {
   public:
-  /**
-	 * This is the compressed bitmap, that is a collection of words. 
-	 * For each word:
-	 *    1* (0x80000000) means that it is a 31-bit literal
-         *
-	 *    00* (0x00000000)  indicates a sequence made up of at 
-	 *    most one set bit in the first 31 bits and followed by
-	 *    blocks of 31 0's. The following 5 bits (00xxxxx*)
-	 *    indicates which is the set bit 
-	 *    ( 00000 = no set bit, 00001 = LSB, 11111 = MSB),
-	 *    while the remaining 25 bits indicate the number of following 0's blocks.
-	 *
-	 *    01* (0x40000000) indicates a sequence made up of at most one unset bit in the first 31 bits, 
-	 *    and followed by blocks of 31 1's. (see the 00* case above).
-	 *  
-	 * Note that literal words 0xFFFFFFFF and 0x80000000 are allowed, thus
-	 * zero-length sequences (i.e., such that getSequenceCount() == 0) cannot exists.               
-	 */
-  vector<unsigned int> words;
+    /**
+  	 * This is the compressed bitmap, that is a collection of words.
+  	 * For each word:
+  	 *    1* (0x80000000) means that it is a 31-bit literal
+           *
+  	 *    00* (0x00000000)  indicates a sequence made up of at
+  	 *    most one set bit in the first 31 bits and followed by
+  	 *    blocks of 31 0's. The following 5 bits (00xxxxx*)
+  	 *    indicates which is the set bit
+  	 *    ( 00000 = no set bit, 00001 = LSB, 11111 = MSB),
+  	 *    while the remaining 25 bits indicate the number of following 0's blocks.
+  	 *
+  	 *    01* (0x40000000) indicates a sequence made up of at most one unset bit in the first 31 bits,
+  	 *    and followed by blocks of 31 1's. (see the 00* case above).
+  	 *
+  	 * Note that literal words 0xFFFFFFFF and 0x80000000 are allowed, thus
+  	 * zero-length sequences (i.e., such that getSequenceCount() == 0) cannot exists.
+  	 */
+    vector<unsigned int> words;
 
-  /**
-	 * Most significant set bit within the uncompressed bit string.
-	 */
-  int last;
+    /**
+  	 * Most significant set bit within the uncompressed bit string.
+  	 */
+    int last;
 
-  /**
-	 * Cached cardinality of the bit-set. Defined for efficient size()
-	 * calls. When -1, the cache is invalid.
-	 */
-  unsigned int size;
+    /**
+  	 * Cached cardinality of the bit-set. Defined for efficient size()
+  	 * calls. When -1, the cache is invalid.
+  	 */
+    unsigned int size;
 
-  /**
-	 * Index of the last word in  #words
-	 */
-  int lastWordIndex;
+    /**
+  	 * Index of the last word in  #words
+  	 */
+    int lastWordIndex;
 
-  /**
-	 * User for <i>fail-fast</i> iterator. It counts the number of operations
-	 * that <i>do</i> modify words
-	 */
-  int modCount = 0;
+    /**
+  	 * User for <i>fail-fast</i> iterator. It counts the number of operations
+  	 * that <i>do</i> modify words
+  	 */
+    int modCount = 0;
 
-  /**
-	 * The highest representable integer.
-	 */
-  unsigned int MAX_ALLOWED_INTEGER = 31 * (1 << 25) + 30;  // 1040187422
+    /**
+  	 * The highest representable integer.
+  	 */
+    unsigned int MAX_ALLOWED_INTEGER = 31 * (1 << 25) + 30;  // 1040187422
 
-  /** 
-	 * The lowest representable integer.
-	 */
-  unsigned int MIN_ALLOWED_SET_BIT = 0;
+    /**
+  	 * The lowest representable integer.
+  	 */
+    unsigned int MIN_ALLOWED_SET_BIT = 0;
 
-  /** 
-	 * Maximum number of representable bits within a literal
-	 */
-  unsigned int MAX_LITERAL_LENGHT = 31;
+    /**
+  	 * Maximum number of representable bits within a literal
+  	 */
+    unsigned int MAX_LITERAL_LENGHT = 31;
 
-  /**
-	 * Literal that represents all bits set to 1 (and MSB = 1)
-	 */
-  unsigned int ALL_ONES_LITERAL = 0xFFFFFFFF;
+    /**
+  	 * Literal that represents all bits set to 1 (and MSB = 1)
+  	 */
+    unsigned int ALL_ONES_LITERAL = 0xFFFFFFFF;
 
-  /**
-	 * Literal that represents all bits set to 0 (and MSB = 1)
-	 */
-  unsigned int ALL_ZEROS_LITERAL = 0x80000000;
+    /**
+  	 * Literal that represents all bits set to 0 (and MSB = 1)
+  	 */
+    unsigned int ALL_ZEROS_LITERAL = 0x80000000;
 
-  /**
-	 * All bits set to 1 and MSB = 0
-	 */
-  unsigned int ALL_ONES_WITHOUT_MSB = 0x7FFFFFFF;
+    /**
+  	 * All bits set to 1 and MSB = 0
+  	 */
+    unsigned int ALL_ONES_WITHOUT_MSB = 0x7FFFFFFF;
 
-  /**
-	 * Sequence bit
-	 */
-  unsigned int SEQUENCE_BIT = 0x40000000;
+    /**
+  	 * Sequence bit
+  	 */
+    unsigned int SEQUENCE_BIT = 0x40000000;
 
-  bool simulateWAH = false;
+    bool simulateWAH = false;
 
-  ConciseSet();
-  //ConciseSet* clone()
-  void reset();
-  int maxLiteralLengthModulus(unsigned int n);
-  int maxLiteralLengthMultiplication(int n);
-  int maxLiteralLengthDivision(int n);
-  bool isLiteral(int word);
-  bool isOneSequence(int word);
-  bool isZeroSequence(int word);
-  bool isSequenceWithNoBits(int word);
-  int getSequenceCount(int word);
-  int getSequenceWithNoBits(int word);
-  int getLiteral(unsigned int word);
-  int getFlippedBit(unsigned int word);
-  int getLiteralBitCount(int word);
-  int getLiteralBits(int word);
-  void clearBitsAfterInLastWord(unsigned int lastSetBit);
-  bool containsOnlyOneBit(int literal);
-  void ensureCapacity(int index);
-  void compact();
-  bool add(int e);
-  void append(int i);
-  void appendLiteral(int word);
-  void appendFill(int length, int fillType);
-  void updateLast();
-  bool isEmpty() { return words.size() == 0; }
+    ConciseSet();
+    //ConciseSet* clone()
+    void reset();
+    int maxLiteralLengthModulus(unsigned int n);
+    int maxLiteralLengthMultiplication(int n);
+    int maxLiteralLengthDivision(int n);
+    bool isLiteral(int word);
+    bool isOneSequence(int word);
+    bool isZeroSequence(int word);
+    bool isSequenceWithNoBits(int word);
+    int getSequenceCount(int word);
+    int getSequenceWithNoBits(int word);
+    int getLiteral(unsigned int word);
+    int getFlippedBit(unsigned int word);
+    int getLiteralBitCount(int word);
+    int getLiteralBits(int word);
+    void clearBitsAfterInLastWord(unsigned int lastSetBit);
+    bool containsOnlyOneBit(int literal);
+    void ensureCapacity(int index);
+    void compact();
+    bool add(int e);
+    void append(int i);
+    void appendLiteral(int word);
+    void appendFill(int length, int fillType);
+    void updateLast();
+    bool isEmpty() { return words.size() == 0; }
 };
 
 class NoSuchElementException {};
 class IndexOutOfBoundsException {
   public:
-  IndexOutOfBoundsException(int index) {}
+    IndexOutOfBoundsException(int index) {}
 };
 
 /**
@@ -128,14 +129,14 @@ class IndexOutOfBoundsException {
  */
 class WordExpander {
   public:
-  virtual bool hasNext() = 0;
-  virtual bool hasPrevious() = 0;
-  virtual int next() = 0;
-  virtual int previous() = 0;
-  virtual void skipAllAfter(int i) = 0;
-  virtual void skipAllBefore(int i) = 0;
-  virtual void reset(int offset, int word, bool fromBeginning) = 0;
-  virtual ~WordExpander() {}
+    virtual bool hasNext() = 0;
+    virtual bool hasPrevious() = 0;
+    virtual int next() = 0;
+    virtual int previous() = 0;
+    virtual void skipAllAfter(int i) = 0;
+    virtual void skipAllBefore(int i) = 0;
+    virtual void reset(int offset, int word, bool fromBeginning) = 0;
+    virtual ~WordExpander() {}
 };
 
 /**
@@ -148,54 +149,54 @@ class LiteralAndZeroFillExpander : WordExpander {
   ConciseSet& set;
 
   public:
-  LiteralAndZeroFillExpander(ConciseSet& set) : set(set) {
-    buffer = new int[set.MAX_LITERAL_LENGHT];
-  }
-  ~LiteralAndZeroFillExpander() { delete buffer; }
-  bool hasNext() { return current < len; }
+    LiteralAndZeroFillExpander(ConciseSet& set) : set(set) {
+      buffer = new int[set.MAX_LITERAL_LENGHT];
+    }
+    ~LiteralAndZeroFillExpander() { delete buffer; }
+    bool hasNext() { return current < len; }
 
-  bool hasPrevious() { return current > 0; }
+    bool hasPrevious() { return current > 0; }
 
-  int next() {
-    if (!hasNext()) throw NoSuchElementException();
-    return buffer[current++];
-  }
+    int next() {
+      if (!hasNext()) throw NoSuchElementException();
+      return buffer[current++];
+    }
 
-  int previous() {
-    if (!hasPrevious()) throw new NoSuchElementException();
-    return buffer[--current];
-  }
+    int previous() {
+      if (!hasPrevious()) throw new NoSuchElementException();
+      return buffer[--current];
+    }
 
-  void skipAllAfter(int i) {
-    while (hasPrevious() && buffer[current - 1] > i) current--;
-  }
+    void skipAllAfter(int i) {
+      while (hasPrevious() && buffer[current - 1] > i) current--;
+    }
 
-  void skipAllBefore(int i) {
-    while (hasNext() && buffer[current] < i) current++;
-  }
+    void skipAllBefore(int i) {
+      while (hasNext() && buffer[current] < i) current++;
+    }
 
-  void reset(int offset, int word, bool fromBeginning) {
-    if (set.isLiteral(word)) {
-      len = 0;
-      for (int i = 0; i < set.MAX_LITERAL_LENGHT; i++)
-        if ((word & (1 << i)) != 0) buffer[len++] = offset + i;
-      current = fromBeginning ? 0 : len;
-    } else {
-      if (set.isZeroSequence(word)) {
-        if (set.simulateWAH || set.isSequenceWithNoBits(word)) {
-          len = 0;
-          current = 0;
-        } else {
-          len = 1;
-          unsigned int uword = word;
-          buffer[0] = offset + ((0x3FFFFFFF & uword) >> 25) - 1;
-          current = fromBeginning ? 0 : 1;
-        }
+    void reset(int offset, int word, bool fromBeginning) {
+      if (set.isLiteral(word)) {
+        len = 0;
+        for (int i = 0; i < set.MAX_LITERAL_LENGHT; i++)
+          if ((word & (1 << i)) != 0) buffer[len++] = offset + i;
+        current = fromBeginning ? 0 : len;
       } else {
-        throw string("sequence of ones!");
+        if (set.isZeroSequence(word)) {
+          if (set.simulateWAH || set.isSequenceWithNoBits(word)) {
+            len = 0;
+            current = 0;
+          } else {
+            len = 1;
+            unsigned int uword = word;
+            buffer[0] = offset + ((0x3FFFFFFF & uword) >> 25) - 1;
+            current = fromBeginning ? 0 : 1;
+          }
+        } else {
+          throw string("sequence of ones!");
+        }
       }
     }
-  }
 };
 
 /**
@@ -291,8 +292,8 @@ class BitIterator {
 };
 
 /**
-	 * Creates an empty integer set
-	 */
+ * Creates an empty integer set
+ */
 ConciseSet::ConciseSet() {}
 
 void ConciseSet::reset() {
@@ -303,13 +304,13 @@ void ConciseSet::reset() {
 }
 
 /**
-	 * Calculates the modulus division by 31 in a faster way than using "n % 31"
-	 *
-	 * This method of finding modulus division by an integer that is one less
-	 * than a power of 2 takes at most O(lg(32)) time.
-	 * The number of operations is at most 12 + 9 * ceil(lg(32))
-	 * see: http://graphics.stanford.edu/~seander/bithacks.html
-	 */
+ * Calculates the modulus division by 31 in a faster way than using "n % 31"
+ *
+ * This method of finding modulus division by an integer that is one less
+ * than a power of 2 takes at most O(lg(32)) time.
+ * The number of operations is at most 12 + 9 * ceil(lg(32))
+ * see: http://graphics.stanford.edu/~seander/bithacks.html
+ */
 int ConciseSet::maxLiteralLengthModulus(unsigned int n) {
   unsigned int m = (n & 0xC1F07C1F) + ((n >> 5) & 0xC1F07C1F);
   m = (m >> 15) + (m & 0x00007FFF);
@@ -327,18 +328,18 @@ int ConciseSet::maxLiteralLengthModulus(unsigned int n) {
 }
 
 /**
-	 * Calculates the multiplication by 31 in a faster way than using <code>n * 31</code>
-	 */
+ * Calculates the multiplication by 31 in a faster way than using <code>n * 31</code>
+ */
 int ConciseSet::maxLiteralLengthMultiplication(int n) { return (n << 5) - n; }
 
 /**
-	 * Calculates the division by 31
-	 */
+ * Calculates the division by 31
+ */
 int ConciseSet::maxLiteralLengthDivision(int n) { return n / 31; }
 
 /**
-	 * Checks whether a word is a literal one
-	 */
+ * Checks whether a word is a literal one
+ */
 bool ConciseSet::isLiteral(int word) {
   // "word" must be 1*
   // NOTE: this is faster than "return (word & 0x80000000) == 0x80000000"
@@ -346,54 +347,54 @@ bool ConciseSet::isLiteral(int word) {
 }
 
 /**
-	 * Checks whether a word contains a sequence of 1's
-	 */
+ * Checks whether a word contains a sequence of 1's
+ */
 bool ConciseSet::isOneSequence(int word) {
   // "word" must be 01*
   return (word & 0xC0000000) == SEQUENCE_BIT;
 }
 
 /**
-	  * Checks whether a word contains a sequence of 0's
-	  */
+  * Checks whether a word contains a sequence of 0's
+  */
 bool ConciseSet::isZeroSequence(int word) {
   // "word" must be 00*
   return (word & 0xC0000000) == 0;
 }
 
 /**
-	  * Checks whether a word contains a sequence of 0's with no set bit, or 1's
-	  * with no unset bit.
-	  */
+  * Checks whether a word contains a sequence of 0's with no set bit, or 1's
+  * with no unset bit.
+  */
 bool ConciseSet::isSequenceWithNoBits(int word) {
   // "word" must be 0?00000*
   return (word & 0xBE000000) == 0x00000000;
 }
 
 /**
-	  * Gets the number of blocks of 1's or 0's stored in a sequence word
-	  */
+  * Gets the number of blocks of 1's or 0's stored in a sequence word
+  */
 int ConciseSet::getSequenceCount(int word) {
   // get the 25 LSB bits
   return word & 0x01FFFFFF;
 }
 
 /**
-	  * Clears the (un)set bit in a sequence
-	  */
+  * Clears the (un)set bit in a sequence
+  */
 int ConciseSet::getSequenceWithNoBits(int word) {
   // clear 29 to 25 LSB bits
   return (word & 0xC1FFFFFF);
 }
 
 /**
-	  * Gets the literal word that represents the first 31 bits of the given the
-	  * word (i.e. the first block of a sequence word, or the bits of a literal word).
-	  *
-	  * If the word is a literal, it returns the unmodified word. In case of a
-	  * sequence, it returns a literal that represents the first 31 bits of the
-	  * given sequence word.
-	  */
+  * Gets the literal word that represents the first 31 bits of the given the
+  * word (i.e. the first block of a sequence word, or the bits of a literal word).
+  *
+  * If the word is a literal, it returns the unmodified word. In case of a
+  * sequence, it returns a literal that represents the first 31 bits of the
+  * given sequence word.
+  */
 int ConciseSet::getLiteral(unsigned int word) {
   if (isLiteral(word)) return word;
 
@@ -405,12 +406,12 @@ int ConciseSet::getLiteral(unsigned int word) {
 }
 
 /**
-	 * Gets the position of the flipped bit within a sequence word. If the
-	 * sequence has no set/unset bit, returns -1.
-	 * 
-	 * Note that the parameter *must* a sequence word, otherwise the
-	 * result is meaningless.
-	 */
+ * Gets the position of the flipped bit within a sequence word. If the
+ * sequence has no set/unset bit, returns -1.
+ *
+ * Note that the parameter *must* a sequence word, otherwise the
+ * result is meaningless.
+ */
 int ConciseSet::getFlippedBit(unsigned int word) {
   // get bits from 30 to 26
   // NOTE: "-1" is required since 00000 represents no bits and 00001 the LSB bit set
@@ -418,8 +419,8 @@ int ConciseSet::getFlippedBit(unsigned int word) {
 }
 
 /**
-	 * Population count
-	 */
+ * Population count
+ */
 static int bitcount(unsigned int word) {
   word -= ((word >> 1) & 0x55555555);
   word = (word & 0x33333333) + ((word >> 2) & 0x33333333);
@@ -428,41 +429,41 @@ static int bitcount(unsigned int word) {
 }
 
 /**
-	 * Gets the number of set bits within the literal word
-	 */
+ * Gets the number of set bits within the literal word
+ */
 int ConciseSet::getLiteralBitCount(int word) { return bitcount(getLiteralBits(word)); }
 
 /**
-	 * Gets the bits contained within the literal word
-	 */
+ * Gets the bits contained within the literal word
+ */
 int ConciseSet::getLiteralBits(int word) { return ALL_ONES_WITHOUT_MSB & word; }
 
 /**
-	 * Clears bits from MSB (excluded, since it indicates the word type) to the
-	 * specified bit (excluded). Last word is supposed to be a literal one.
-	 */
+ * Clears bits from MSB (excluded, since it indicates the word type) to the
+ * specified bit (excluded). Last word is supposed to be a literal one.
+ */
 void ConciseSet::clearBitsAfterInLastWord(unsigned int lastSetBit) {
   words[lastWordIndex] &= ALL_ZEROS_LITERAL | (0xFFFFFFFF >> (31 - lastSetBit));
 }
 
 /**
-	 * Returns <code>true</code> when the given 31-bit literal string (namely,
-	 * with MSB set) contains only one set bit
-	 */
+ * Returns <code>true</code> when the given 31-bit literal string (namely,
+ * with MSB set) contains only one set bit
+ */
 bool ConciseSet::containsOnlyOneBit(int literal) { return (literal & (literal - 1)) == 0; }
 
 /**
-	 * Assures that the length of {@link #words} is sufficient to contain
-	 * the given index.
-	 */
+ * Assures that the length of {@link #words} is sufficient to contain
+ * the given index.
+ */
 void ConciseSet::ensureCapacity(int index) {
   //TODO: words.resize(index);
 }
 
 /**
-	 * Removes unused allocated words at the end of {@link #words} only when they
-	 * are more than twice of the needed space
-	 */
+ * Removes unused allocated words at the end of {@link #words} only when they
+ * are more than twice of the needed space
+ */
 void ConciseSet::compact() {
   // TODO: compact words
 }
@@ -589,11 +590,11 @@ void ConciseSet::append(int i) {
 }
 
 /**
-   * Append a literal word after the last word
-   *
-   * @param word the new literal word. Note that the leftmost bit <b>must</b>
-   *             be set to 1.
-   */
+ * Append a literal word after the last word
+ *
+ * @param word the new literal word. Note that the leftmost bit <b>must</b>
+ *             be set to 1.
+ */
 void ConciseSet::appendLiteral(int word) {
   // when we have a zero sequence of the maximum lenght (that is,
   // 00.00000.1111111111111111111111111 = 0x01FFFFFF), it could happen
@@ -639,13 +640,13 @@ void ConciseSet::appendLiteral(int word) {
 }
 
 /**
-	 * Append a sequence word after the last word
-	 * 
-	 * @param length
-	 *            sequence length
-	 * @param fillType
-	 *            sequence word with a count that equals 0
-	 */
+ * Append a sequence word after the last word
+ *
+ * @param length
+ *            sequence length
+ * @param fillType
+ *            sequence word with a count that equals 0
+ */
 void ConciseSet::appendFill(int length, int fillType) {
   assert length > 0;
   assert lastWordIndex >= -1;
@@ -690,4 +691,4 @@ void ConciseSet::appendFill(int length, int fillType) {
   }
 }
 
-#endif  // COMPRESSED_SET_H__
+#endif  // CONCISE_SET_H__

@@ -11,16 +11,14 @@
 Codec CompressedSet::codec;
 CompressedSet::CompressedSet(const CompressedSet& other)
     : currentNoCompBlock(DEFAULT_BATCH_SIZE, 0) {
-  assert(
-      totalDocIdNum <=
-      1);  // You are trying to copy the bitmap, a terrible idea in general, for performance reasons
+  // You are trying to copy the bitmap, a terrible idea in general, for performance reasons
+  assert(totalDocIdNum <= 1);
   sizeOfCurrentNoCompBlock = other.sizeOfCurrentNoCompBlock;
   totalDocIdNum = other.totalDocIdNum;
   memcpy(&currentNoCompBlock[0], &other.currentNoCompBlock[0],
          sizeof(uint32_t) * DEFAULT_BATCH_SIZE);
 }
 
-// CompressedSet::CompressedSet() : currentNoCompBlock(DEFAULT_BATCH_SIZE, 0)
 CompressedSet::CompressedSet() : currentNoCompBlock(0) {
   sizeOfCurrentNoCompBlock = 0;
   totalDocIdNum = 0;
@@ -83,8 +81,8 @@ shared_ptr<Set::Iterator> CompressedSet::iterator() const {
 }
 
 /**
-     * Add an array of sorted docIds to the set
-     */
+ * Add an array of sorted docIds to the set
+ */
 void CompressedSet::addDocs(unsigned int* docids, size_t start, size_t len) {
   if ((len + sizeOfCurrentNoCompBlock) <= DEFAULT_BATCH_SIZE) {
     currentNoCompBlock.resize(len + sizeOfCurrentNoCompBlock);
@@ -119,18 +117,17 @@ void CompressedSet::addDocs(unsigned int* docids, size_t start, size_t len) {
       memcpy(&currentNoCompBlock[0], &docids[newStart], leftLen * 4);
     }
     sizeOfCurrentNoCompBlock = leftLen;
-    //currentNoCompBlock.resize(sizeOfCurrentNoCompBlock);
   }
 
   totalDocIdNum += len;
 }
 
 /**
-   * Add document to this set
-   * Note that you must set the bits in increasing order:
-   * addDoc(1), addDoc(2) is ok;
-   * addDoc(2), addDoc(1) is not ok.
-   */
+ * Add document to this set
+ * Note that you must set the bits in increasing order:
+ * addDoc(1), addDoc(2) is ok;
+ * addDoc(2), addDoc(1) is not ok.
+ */
 void CompressedSet::addDoc(unsigned int docId) {
   if (PREDICT_TRUE(sizeOfCurrentNoCompBlock != DEFAULT_BATCH_SIZE)) {
     currentNoCompBlock.resize(sizeOfCurrentNoCompBlock + 1);
@@ -182,16 +179,7 @@ CompressedSet CompressedSet::removeDoc(unsigned int docId) {
 }
 
 void CompressedSet::removeDocId(unsigned int docId) {
-  // TODO:
-
-  /*
-        CompressedSet set;
-        set = this->removeDoc(docId);
-        this->swap(set);
-        */
-
-  // or fix the interface to be able to return Set instead of CompressedSet
-
+  // TODO or fix the interface to be able to return Set instead of CompressedSet
   throw - 17;
 }
 
@@ -207,112 +195,28 @@ void CompressedSet::compact() {
   compactBaseListForOnlyCompBlocks();
 }
 
-/**
-   * Prefix Sum
-   *
-   */
-/*
-  static void delta(unsigned int block[], size_t size) {
-    for(int i=size-1;i>0;--i)
-    {
-      block[i] = block[i] - block[i-1];
-    }
-  }
-
-  static void inverseDelta(unsigned int data[], const size_t size) {
-        if (size == 0)
-            return;
-        size_t i = 1;
-        for (;i < size - 1;i += 2) {
-            data[i] += data[i - 1];
-            data[i + 1] += data[i];
-        }
-        for (;i != size;++i) {
-            data[i] += data[i - 1];
-        }
-  }
-
-  // Simd delta
-  void CompressedSet::preProcessBlock(unsigned int pData[], size_t TotalQty){
-     if (TotalQty < 5) {
-         delta(pData, TotalQty);// no SIMD
-         return;
-     }
-
-     const size_t Qty4 = TotalQty / 4;
-     __m128i* pCurr = reinterpret_cast<__m128i*>(pData);
-     const __m128i* pEnd = pCurr + Qty4;
-
-     __m128i last = _mm_setzero_si128();
-     while (pCurr < pEnd) {
-         __m128i a0 = _mm_load_si128(pCurr);
-         __m128i a1 = _mm_sub_epi32(a0, _mm_srli_si128(last, 12));
-         a1 = _mm_sub_epi32(a1, _mm_slli_si128(a0, 4));
-         last = a0;
-
-         _mm_store_si128(pCurr++ , a1);
-     }
-
-     if (Qty4 * 4 < TotalQty) {
-         uint32_t lastVal = _mm_cvtsi128_si32(_mm_srli_si128(last, 12));
-         for (size_t i = Qty4 * 4;i < TotalQty;++i) {
-             uint32_t newVal = pData[i];
-             pData[i] -= lastVal;
-             lastVal = newVal;
-         }
-     }
-  }
-
-  // simd inverseDelta
-  static void postProcessBlock(unsigned int* pData, const size_t TotalQty) {
-     if (TotalQty < 5) {
-         inverseDelta(pData, TotalQty);// no SIMD
-         return;
-     }
-     const size_t Qty4 = TotalQty / 4;
-
-     __m128i runningCount = _mm_setzero_si128();
-     __m128i* pCurr = reinterpret_cast<__m128i*>(pData);
-     const __m128i* pEnd = pCurr + Qty4;
-     while (pCurr < pEnd) {
-         __m128i a0 = _mm_load_si128(pCurr);
-         __m128i a1 = _mm_add_epi32(_mm_slli_si128(a0, 8),a0);
-         __m128i a2 = _mm_add_epi32(_mm_slli_si128(a1, 4),a1);
-         a0 = _mm_add_epi32(a2,runningCount);
-         runningCount = _mm_shuffle_epi32(a0, 0xFF);
-         _mm_store_si128(pCurr++ , a0);
-     }
-
-     for (size_t i = Qty4 * 4;i < TotalQty;++i) {
-         pData[i] += pData[i-1];
-     }
-  }
-  */
-
 const shared_ptr<CompressedDeltaChunk> CompressedSet::PForDeltaCompressOneBlock(unsigned int* block,
                                                                                 size_t blocksize) {
   return codec.Compress(block, blocksize);
 }
 
 const shared_ptr<CompressedDeltaChunk> CompressedSet::PForDeltaCompressCurrentBlock() {
-  // preProcessBlock not needed when using integrated deltacoding
-  // preProcessBlock(&currentNoCompBlock[0], sizeOfCurrentNoCompBlock);
   const shared_ptr<CompressedDeltaChunk> finalRes =
       PForDeltaCompressOneBlock(&currentNoCompBlock[0], sizeOfCurrentNoCompBlock);
   return finalRes;
 }
 
 /**
-     * Gets the number of ids in the set
-     * @return docset size
-     */
+ * Gets the number of ids in the set
+ * @return docset size
+ */
 unsigned int CompressedSet::size() const { return totalDocIdNum; }
 
 /**
-     * if more then 1/8 of bit are set to 1 in range [minSetValue,maxSetvalue]
-     * you should use EWAHBoolArray compression instead
-     * because this compression will take at least 8 bits by positions
-     */
+ * if more then 1/8 of bit are set to 1 in range [minSetValue,maxSetvalue]
+ * you should use EWAHBoolArray compression instead
+ * because this compression will take at least 8 bits by positions
+ */
 bool CompressedSet::isDense() {
   if (totalDocIdNum == 0) return false;
   CompressedSet set;
@@ -331,10 +235,8 @@ bool CompressedSet::isDense() {
 //This method will not work after a call to flush()
 inline bool CompressedSet::find(unsigned int target) const {
   vector<uint32_t, AlignedSTLAllocator<uint32_t, 64>> myDecompBlock(DEFAULT_BATCH_SIZE, 0);
-  //unsigned int lastId = lastAdded;
   if (PREDICT_FALSE(totalDocIdNum == 0)) return false;
   if (sizeOfCurrentNoCompBlock != 0) {
-    //int lastId = currentNoCompBlock[sizeOfCurrentNoCompBlock-1];
     if (sizeOfCurrentNoCompBlock > 0 && target > currentNoCompBlock[sizeOfCurrentNoCompBlock - 1]) {
       return false;
     }
@@ -359,7 +261,7 @@ inline bool CompressedSet::find(unsigned int target) const {
         baseListForOnlyCompBlocks, 0, baseListForOnlyCompBlocks.size() - 1, target);
     if (index < 0) return false;  // target is bigger then biggest value
 
-    ////uncompress block
+    // uncompress block
     Source src = sequenceOfCompBlocks.get(index).getSource();
     size_t uncompSize = codec.Uncompress(src, &myDecompBlock[0], DEFAULT_BATCH_SIZE);
     return codec.findInArray(&myDecompBlock[0], uncompSize, target);
@@ -373,7 +275,7 @@ CompressedSet::Iterator::Iterator(const CompressedSet* const parentSet)
   compBlockNum = set->sequenceOfCompBlocks.size();
 
   lastAccessedDocId = -1;
-  // need to be fixed (iterDecompBlock should be 128bit aligned)
+  // FIXME: (iterDecompBlock should be 128bit aligned)
   // iterDecompBlock  = new unsigned int[DEFAULT_BATCH_SIZE];
   cursor = -1;
   totalDocIdNum = set->totalDocIdNum;
@@ -385,45 +287,36 @@ CompressedSet::Iterator::Iterator(const CompressedSet::Iterator& other)
   totalDocIdNum = other.totalDocIdNum;
   lastAccessedDocId = other.lastAccessedDocId;
   compBlockNum = other.compBlockNum;
-  // need to be fixed (iterDecompBlock should be 128bit aligned)
+  // FIXME: (iterDecompBlock should be 128bit aligned)
   // iterDecompBlock  = new unsigned int[DEFAULT_BATCH_SIZE];
   memcpy(&iterDecompBlock[0], &other.iterDecompBlock[0], sizeof(uint32_t) * DEFAULT_BATCH_SIZE);
 
   set = other.set;
-  //BLOCK_INDEX_SHIFT_BITS = other.BLOCK_INDEX_SHIFT_BITS;
 }
 
 CompressedSet::Iterator& CompressedSet::Iterator::operator=(const CompressedSet::Iterator& other) {
-  // delete[] iterDecompBlock;
   cursor = other.cursor;
   totalDocIdNum = other.totalDocIdNum;
   lastAccessedDocId = other.lastAccessedDocId;
   compBlockNum = other.compBlockNum;
 
-  // iterDecompBlock  = new unsigned int[DEFAULT_BATCH_SIZE];
   memcpy(&iterDecompBlock[0], &other.iterDecompBlock[0], sizeof(uint32_t) * DEFAULT_BATCH_SIZE);
 
   set = other.set;
-  //BLOCK_INDEX_SHIFT_BITS = other.BLOCK_INDEX_SHIFT_BITS;
   return *this;
 }
 
-CompressedSet::Iterator::~Iterator() {
-  // delete[] iterDecompBlock;
-}
+CompressedSet::Iterator::~Iterator() {}
 
 /**
-     * Get the index of the batch this cursor position falls into
-     *
-     * @param index
-     * @return
-     */
+ * Get the index of the batch this cursor position falls into
+ */
 int CompressedSet::Iterator::getBlockIndex(int docIdIndex) {
   return docIdIndex >> BLOCK_INDEX_SHIFT_BITS;
 }
 
 unsigned int CompressedSet::Iterator::nextDoc() {
-  //: if the pointer points to the end
+  // if the pointer points to the end
   if (PREDICT_FALSE(++cursor == totalDocIdNum)) {
     lastAccessedDocId = NO_MORE_DOCS;
   } else {
@@ -433,7 +326,6 @@ unsigned int CompressedSet::Iterator::nextDoc() {
       lastAccessedDocId = set->currentNoCompBlock[offset];
     } else {
       if (PREDICT_TRUE(offset)) {
-//lastAccessedDocId = iterDecompBlock[offset];
 #ifdef PREFIX_SUM
         lastAccessedDocId += (iterDecompBlock[offset]);
 #else
@@ -443,11 +335,6 @@ unsigned int CompressedSet::Iterator::nextDoc() {
         // (offset==0) must be in one of the compressed blocks
         Source src = set->sequenceOfCompBlocks.get(iterBlockIndex).getSource();
         set->codec.Uncompress(src, &iterDecompBlock[0], DEFAULT_BATCH_SIZE);
-#ifndef PREFIX_SUM
-// postProcessBlock not needed if using integrated delta coding
-// postProcessBlock(&iterDecompBlock[0], DEFAULT_BATCH_SIZE);
-#endif
-        // assert(uncompSize == DEFAULT_BATCH_SIZE);
         lastAccessedDocId = iterDecompBlock[0];
       }
     }
@@ -492,10 +379,9 @@ int CompressedSet::Iterator::advanceToTargetInTheFollowingCompBlocks(int target,
 }
 
 /**
-    * Implement the same functionality as advanceToTargetInTheFollowingCompBlocks()
-    * except that this function do prefix sum during searching
-    *
-    */
+  * Implement the same functionality as advanceToTargetInTheFollowingCompBlocks()
+  * except that this function do prefix sum during searching
+  */
 int CompressedSet::Iterator::advanceToTargetInTheFollowingCompBlocksNoPostProcessing(
     unsigned int target, int startBlockIndex) {
   // searching from the current block
@@ -503,11 +389,9 @@ int CompressedSet::Iterator::advanceToTargetInTheFollowingCompBlocksNoPostProces
       set->baseListForOnlyCompBlocks, startBlockIndex, set->baseListForOnlyCompBlocks.size() - 1,
       target);
 
-  /*
-        iterBlockIndex might be the current uncompressed block !!!
-      */
+  // iterBlockIndex might be the current uncompressed block !!!
 
-  //"ERROR: advanceToTargetInTheFollowingCompBlocks(): Impossible, we must be able to find the block"
+  // "ERROR: advanceToTargetInTheFollowingCompBlocks(): Impossible, we must be able to find the block"
   assert(iterBlockIndex >= 0);
 
   Source src = set->sequenceOfCompBlocks.get(iterBlockIndex).getSource();
@@ -519,7 +403,6 @@ int CompressedSet::Iterator::advanceToTargetInTheFollowingCompBlocksNoPostProces
     return lastAccessedDocId;
   }
 
-  // int currentoffset = cursor & BLOCK_SIZE_MODULO;
   for (size_t offset = 1; offset < uncompSize; ++offset) {
     lastAccessedDocId += (iterDecompBlock[offset]);
     if (lastAccessedDocId >= target) {
@@ -533,9 +416,8 @@ int CompressedSet::Iterator::advanceToTargetInTheFollowingCompBlocksNoPostProces
   return -1;
 }
 
-// Advances to the first beyond the current
-// whose value is greater than or equal to target.
-// we do linear search inside block because of delta encoding
+// Advances to the first beyond the current whose value is greater than or equal to target.
+// We do linear search inside block because of delta encoding.
 unsigned int CompressedSet::Iterator::Advance(unsigned int target) {
   // if the pointer points past the end
   if (PREDICT_FALSE(cursor == totalDocIdNum || totalDocIdNum <= 0)) {

@@ -8,17 +8,14 @@
 #include "varint/BasicSet.h"
 
 BasicSet::BasicSet(const BasicSet& other) { docs = other.docs; }
+BasicSet::BasicSet() {}
+BasicSet::~BasicSet() {}
 
 /**
-    * Swap the content of this bitmap with another bitmap.
-    * No copying is done. (Running time complexity is constant.)
-    */
-
+  * Swap the content of this bitmap with another bitmap.
+  * No copying is done. (Running time complexity is constant.)
+  */
 void BasicSet::swap(BasicSet& x) { assert(false); }
-
-BasicSet::BasicSet() {}
-
-BasicSet::~BasicSet() {}
 
 void BasicSet::write(ostream& out) {
   for (auto val : docs) {
@@ -42,35 +39,13 @@ shared_ptr<Set::Iterator> BasicSet::iterator() const {
 }
 
 /**
-	 * Add document to this set
-	 */
+ * Add document to this set
+ */
 void BasicSet::addDoc(unsigned int docId) { docs.insert(docId); }
 
 void BasicSet::addDocs(unsigned int* docids, size_t start, size_t len) { throw - 1; }
 
 BasicSet BasicSet::unorderedAdd(unsigned int docId) {
-  /*
-		BasicSet set;
-		BasicSet::Iterator it(this);
-		bool inserted = false;
-		while (it.nextDoc() != NO_MORE_DOCS )
-		{
-			unsigned int val = it.docID();
-			if (val > docId && !inserted)
-			{
-				inserted = true;
-				set.addDoc(docId);
-			}
-
-			set.addDoc(val);
-		}
-
-		if (!inserted)
-		{
-			set.addDoc(docId);
-		}
-		*/
-
   BasicSet set;
   set.addDoc(docId);
 
@@ -95,9 +70,9 @@ BasicSet BasicSet::removeDoc(unsigned int docId) {
 void BasicSet::compact() {}
 
 /**
-     * Gets the number of ids in the set
-     * @return docset size
-     */
+ * Gets the number of ids in the set
+ * @return docset size
+ */
 unsigned int BasicSet::size() const { return docs.size(); }
 
 inline bool BasicSet::find(unsigned int target) const {
@@ -128,7 +103,6 @@ unsigned int BasicSet::Iterator::nextDoc() {
   if (!init) {
     init = true;
     return *cursor;
-    ;
   }
 
   if ((cursor != (set->docs).end()) && (++cursor != (set->docs).end())) {
@@ -144,8 +118,7 @@ unsigned int BasicSet::Iterator::docID() {
   return NO_MORE_DOCS;
 }
 
-// Advances to the first beyond the current
-// whose value is greater than or equal to target.
+// Advances to the first beyond the current whose value is greater than or equal to target.
 unsigned int BasicSet::Iterator::Advance(unsigned int target) {
   while (cursor != (set->docs).end()) {
     if ((*cursor++ >= target) && (cursor != (set->docs).end())) {

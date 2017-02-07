@@ -1,14 +1,12 @@
 #ifndef COLLECTION_HELPER_H__
 #define COLLECTION_HELPER_H__
+
 /**
-   * Binary search for the first element that is equal to or larger than the target
-   *
-   * @param in must be sorted and contains no duplicates
-   * @param start
-   * @param end
-   * @param target
-   * @return the index of the first element in the array that is equal or larger than the target. -1 if the target is out of range.
-   */
+ * Binary search for the first element that is equal to or larger than the target
+ *
+ * @param in must be sorted and contains no duplicates
+ * @return the index of the first element in the array that is equal or larger than the target. -1 if the target is out of range.
+ */
 int binarySearchForFirstElementEqualOrLargerThanTarget(const vector<unsigned int>& in, int start,
                                                        int end, unsigned int target) {
   int mid;
@@ -28,14 +26,11 @@ int binarySearchForFirstElementEqualOrLargerThanTarget(const vector<unsigned int
 }
 
 /**
-   * Binary search for the first element that is equal to or larger than the target
-   *
-   * @param in must be sorted and contains no duplicates
-   * @param start
-   * @param end
-   * @param target
-   * @return the index of the first element in the array that is equal or larger than the target. -1 if the target is out of range.
-   */
+ * Binary search for the first element that is equal to or larger than the target
+ *
+ * @param in must be sorted and contains no duplicates
+ * @return the index of the first element in the array that is equal or larger than the target. -1 if the target is out of range.
+ */
 int binarySearchForFirstElementEqualOrLargerThanTarget(const unsigned int* in, int start, int end,
                                                        unsigned int target) {
   int mid;
@@ -55,9 +50,9 @@ int binarySearchForFirstElementEqualOrLargerThanTarget(const unsigned int* in, i
 }
 
 /**
-   *  Binary search in the base list for the block that may contain
-   *  docId greater than or equal to the target
-   */
+ *  Binary search in the base list for the block that may contain
+ *  docId greater than or equal to the target
+ */
 int binarySearchInBaseListForBlockThatMayContainTarget(const vector<unsigned int>& in, int start,
                                                        int end, int target) {
   //the baseListForOnlyCompBlocks (in) contains all last elements of the compressed blocks.
@@ -65,14 +60,11 @@ int binarySearchInBaseListForBlockThatMayContainTarget(const vector<unsigned int
 }
 
 /**
-   * Regular Binary search for the the target
-   *
-   * @param vals must be sorted
-   * @param start
-   * @param end
-   * @param target
-   * @return the index of the target in the input array. -1 if the target is out of range.
-   */
+ * Regular Binary search for the the target
+ *
+ * @param vals must be sorted
+ * @return the index of the target in the input array. -1 if the target is out of range.
+ */
 int binarySearchForTarget(vector<unsigned int>& vals, int start, int end, unsigned int target) {
   int mid;
   while (start <= end) {
