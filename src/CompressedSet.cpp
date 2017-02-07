@@ -1,12 +1,12 @@
 #include <iostream>
 #include <stdio.h>
 #include <assert.h>
-#include "Source.h"
-#include "Sink.h"
+#include "varint/Source.h"
+#include "varint/Sink.h"
 #include <vector>
 #include <memory>
 #include "CollectionHelper.h"
-#include "CompressedSet.h"
+#include "varint/CompressedSet.h"
 
     Codec CompressedSet::codec;
     CompressedSet::CompressedSet(const CompressedSet& other)
@@ -59,7 +59,7 @@
             if (totalDocIdNum < DEFAULT_BATCH_SIZE) {
                 sizeOfCurrentNoCompBlock = totalDocIdNum;
             } else {
-                in.read((char*)&sizeOfCurrentNoCompBlock,4); 
+                in.read((char*)&sizeOfCurrentNoCompBlock,4);
             }
 
             currentNoCompBlock.resize(sizeOfCurrentNoCompBlock);
@@ -256,7 +256,7 @@
          __m128i a1 = _mm_sub_epi32(a0, _mm_srli_si128(last, 12));
          a1 = _mm_sub_epi32(a1, _mm_slli_si128(a0, 4));
          last = a0;
-        
+
          _mm_store_si128(pCurr++ , a1);
      }
 
@@ -270,7 +270,7 @@
      }
   }
 
-  // simd inverseDelta  
+  // simd inverseDelta
   static void postProcessBlock(unsigned int* pData, const size_t TotalQty) {
      if (TotalQty < 5) {
          inverseDelta(pData, TotalQty);// no SIMD
@@ -295,7 +295,7 @@
      }
   }
   */
-  
+
   const shared_ptr<CompressedDeltaChunk> CompressedSet::PForDeltaCompressOneBlock(unsigned int* block,size_t blocksize){
     return codec.Compress(block,blocksize);
   }
@@ -448,14 +448,14 @@
              int offset = cursor & BLOCK_SIZE_MODULO;
              if( iterBlockIndex == compBlockNum  ) {
                  lastAccessedDocId = set->currentNoCompBlock[offset];
-             } else { 
+             } else {
                  if (PREDICT_TRUE(offset)){
                     //lastAccessedDocId = iterDecompBlock[offset];
                     #ifdef PREFIX_SUM
                        lastAccessedDocId += (iterDecompBlock[offset]);
                     #else
                        lastAccessedDocId = iterDecompBlock[offset];
-                    #endif  
+                    #endif
                  } else {
                     // (offset==0) must be in one of the compressed blocks
                     Source src = set->sequenceOfCompBlocks.get(iterBlockIndex).getSource();
@@ -463,7 +463,7 @@
                     #ifndef PREFIX_SUM
                       // postProcessBlock not needed if using integrated delta coding
                       // postProcessBlock(&iterDecompBlock[0], DEFAULT_BATCH_SIZE);
-                    #endif       
+                    #endif
                     // assert(uncompSize == DEFAULT_BATCH_SIZE);
                      lastAccessedDocId = iterDecompBlock[0];
                  }
@@ -488,7 +488,7 @@
       int currentBlockIndex = cursor >> BLOCK_SIZE_BIT;
       int currentOffset = cursor & BLOCK_SIZE_MODULO;
 
-      // if we are already on currentBlockIndex and currentOffset >0 
+      // if we are already on currentBlockIndex and currentOffset >0
       // this mean the block is already decompresed by last iteration
       // we can skip this decompressing it again
       if (currentBlockIndex != iterBlockIndex || currentOffset == 0){
@@ -497,7 +497,7 @@
           //postProcessBlock not needed if using integrated delta coding
           //postProcessBlock(&iterDecompBlock[0], DEFAULT_BATCH_SIZE);
       }
-      
+
       int offset = binarySearchForFirstElementEqualOrLargerThanTarget(&(iterDecompBlock[0]), 0, DEFAULT_BATCH_SIZE-1, target);
       assert(offset >= 0);
       if(offset < 0)
@@ -508,7 +508,7 @@
       cursor = (iterBlockIndex << BLOCK_INDEX_SHIFT_BITS) + offset;
       return iterDecompBlock[offset];
     }
-    
+
     /**
     * Implement the same functionality as advanceToTargetInTheFollowingCompBlocks()
     * except that this function do prefix sum during searching
@@ -522,7 +522,7 @@
       /*
         iterBlockIndex might be the current uncompressed block !!!
       */
-      
+
       //"ERROR: advanceToTargetInTheFollowingCompBlocks(): Impossible, we must be able to find the block"
       assert(iterBlockIndex >= 0);
 
@@ -534,7 +534,7 @@
         cursor = (iterBlockIndex << BLOCK_INDEX_SHIFT_BITS) + 0;
         return lastAccessedDocId;
       }
-      
+
       // int currentoffset = cursor & BLOCK_SIZE_MODULO;
       for (size_t offset=1;offset < uncompSize;++offset)
       {
@@ -570,7 +570,7 @@
         if(cursor != 0 && target <= lastAccessedDocId) {
             target = lastAccessedDocId + 1;
         }
-        
+
 
         int iterBlockIndex = cursor >> BLOCK_SIZE_BIT;
         int offset = cursor & BLOCK_SIZE_MODULO;
@@ -581,7 +581,7 @@
         // the last element of the last compressed block
         unsigned int sizeOfCurrentNoCompBlock = set->sizeOfCurrentNoCompBlock;
         size_t baseListForOnlyCompBlocksSize = set->baseListForOnlyCompBlocks.size();
-        
+
         if(sizeOfCurrentNoCompBlock>0) {// if there exists the last decomp block
           if(iterBlockIndex == compBlockNum ||
              (baseListForOnlyCompBlocksSize>0 && target > set->baseListForOnlyCompBlocks[baseListForOnlyCompBlocksSize-1])) {
@@ -620,7 +620,7 @@
                     lastAccessedDocId += (iterDecompBlock[offset]);
                  #else
                     lastAccessedDocId = (iterDecompBlock[offset]);
-                 #endif  
+                 #endif
                  if (lastAccessedDocId >= target) {
                    break;
                  }
@@ -639,7 +639,7 @@
                    lastAccessedDocId = advanceToTargetInTheFollowingCompBlocksNoPostProcessing(target, iterBlockIndex);
                 #else
                    lastAccessedDocId = advanceToTargetInTheFollowingCompBlocks(target, iterBlockIndex);
-                #endif  
+                #endif
                 return lastAccessedDocId;
              }
            }

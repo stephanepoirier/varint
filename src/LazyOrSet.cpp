@@ -1,4 +1,4 @@
-#include "LazyOrSet.h"
+#include "varint/LazyOrSet.h"
 
 
 LazyOrSet::LazyOrSet(vector<shared_ptr<Set>> docSets)
@@ -13,7 +13,7 @@ LazyOrSet::LazyOrSet(shared_ptr<Set>& left,shared_ptr<Set> & right)
 }
 
 
-shared_ptr<Set::Iterator>  LazyOrSet::iterator() const 
+shared_ptr<Set::Iterator>  LazyOrSet::iterator() const
 {
    shared_ptr<Set::Iterator> it(new LazyOrSetIterator(sets));
    return it;
@@ -30,14 +30,14 @@ unsigned int LazyOrSet::size()  const
 	return _size;
 }
 
-bool LazyOrSet::find(unsigned int val) const 
-{ 
+bool LazyOrSet::find(unsigned int val) const
+{
 	LazyOrSetIterator finder(sets);
 	unsigned int docid = finder.Advance(val);
 	return docid != NO_MORE_DOCS && docid == val;
 }
 
-		
+
 LazyOrSetIterator::LazyOrSetIterator(vector<shared_ptr<Set>> sets){
 	_curDoc = 0;
 	_size = sets.size();
@@ -48,11 +48,11 @@ LazyOrSetIterator::LazyOrSetIterator(vector<shared_ptr<Set>> sets){
 		_curDoc = NO_MORE_DOCS;
 	}
 }
-	
+
 unsigned int LazyOrSetIterator::docID() {
     return _curDoc;
 }
-	
+
 unsigned int LazyOrSetIterator::nextDoc() {
     if(_curDoc == NO_MORE_DOCS) {
         return NO_MORE_DOCS;
@@ -78,16 +78,16 @@ unsigned int LazyOrSetIterator::nextDoc() {
       }
     }
 }
-	
+
 unsigned int LazyOrSetIterator::Advance(unsigned int target) {
   if(_curDoc == NO_MORE_DOCS) {
     return NO_MORE_DOCS;
   }
-  
+
   if(target <= _curDoc) {
     target = _curDoc + 1;
   }
-  
+
   shared_ptr<Item> top = _heap[0];
   while(true) {
     shared_ptr<Set::Iterator> topIter = top->iter;
@@ -131,34 +131,34 @@ void LazyOrSetIterator::heapAdjust(){
     int doc = top->doc;
     int size = _size;
     int i = 0;
-    
+
     while(true)
     {
       int lchild = (i<<1)+1;
       if(lchild >= size) break;
-      
+
       shared_ptr<Item> left = _heap[lchild];
       int ldoc = left->doc;
-      
+
       int rchild = lchild+1;
       if(rchild < size){
         shared_ptr<Item> right = _heap[rchild];
         int rdoc = right->doc;
-        
+
         if(rdoc <= ldoc)
         {
           if(doc <= rdoc) break;
-          
+
           _heap[i] = right;
           i = rchild;
           continue;
         }
       }
-      
+
       if(doc <= ldoc) break;
-      
+
       _heap[i] = left;
       i = lchild;
     }
-    _heap[i] = top;	 
+    _heap[i] = top;
 }

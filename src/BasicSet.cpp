@@ -5,7 +5,7 @@
 #include <memory>
 #include <algorithm>
 
-#include "BasicSet.h"
+#include "varint/BasicSet.h"
 
 	BasicSet::BasicSet(const BasicSet& other)
 	{
@@ -204,5 +204,3 @@
 
 		return NO_MORE_DOCS;
     }
-
-

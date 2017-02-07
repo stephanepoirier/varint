@@ -1,6 +1,6 @@
 #include <vector>
-#include "Set.h"
-#include "LazyAndSet.h"
+#include "varint/Set.h"
+#include "varint/LazyAndSet.h"
 
 
 
@@ -29,8 +29,8 @@ LazyAndSet::LazyAndSet(vector<shared_ptr<Set> >& sets)
 	init = false;
 }
 
-inline bool LazyAndSet::find(unsigned int val) const 
-{ 
+inline bool LazyAndSet::find(unsigned int val) const
+{
 	LazyAndSetIterator finder(this);
 	unsigned docid = finder.Advance(val);
 	return docid != NO_MORE_DOCS && docid == val;
@@ -52,18 +52,18 @@ unsigned int LazyAndSet::size() const
 	return setSize;
 }
 
-shared_ptr<Set::Iterator> LazyAndSet::iterator() const 
+shared_ptr<Set::Iterator> LazyAndSet::iterator() const
 {
 	shared_ptr<Set::Iterator> it(new LazyAndSetIterator(this));
 	return it;
-}	
+}
 
 LazyAndSetIterator::LazyAndSetIterator(const LazyAndSet* parent) : set(*parent){
 	if (set.nonNullSize == 0){
 		lastReturn = NO_MORE_DOCS;
 		return;
 	}
-	    	
+
 	for (vector<shared_ptr<Set> >::const_iterator it = set.sets_.begin(); it!=set.sets_.end(); it++){
 		shared_ptr<Set> set  = *it;
 		shared_ptr<Set::Iterator>  dcit = set->iterator();
@@ -78,32 +78,32 @@ unsigned int  LazyAndSetIterator::docID() {
 
 unsigned int LazyAndSetIterator::nextDoc() {
     // DAAT
-    if (lastReturn == NO_MORE_DOCS) 
-       return NO_MORE_DOCS;    
-    
+    if (lastReturn == NO_MORE_DOCS)
+       return NO_MORE_DOCS;
+
     shared_ptr<Set::Iterator> dcit = iterators[0];
     unsigned target = dcit->nextDoc();
 
     // shortcut: if it reaches the end of the shortest list, do not scan other lists
-    if(target == NO_MORE_DOCS) { 
+    if(target == NO_MORE_DOCS) {
         return (lastReturn = target);
     }
 
     int size = iterators.size();
     int skip = 0;
     int i = 1;
-   
+
     // i is ith iterator
     while (i < size) {
       if (i != skip) {
         dcit = iterators[i];
         unsigned int docId = dcit->Advance(target);
-       
+
         // once we reach the end of one of the blocks, we return NO_MORE_DOCS
         if(docId == NO_MORE_DOCS) {
           return (lastReturn = docId);
         }
-    
+
         if (docId > target) { //  cannot find the target in the next list
           target = docId;
           if(i != 0) {
@@ -118,20 +118,20 @@ unsigned int LazyAndSetIterator::nextDoc() {
       }
       i++;
     }
-   
+
     return (lastReturn = target);
 }
 
 unsigned int LazyAndSetIterator::Advance(unsigned int  target) {
-     if (lastReturn == NO_MORE_DOCS) 
+     if (lastReturn == NO_MORE_DOCS)
         return NO_MORE_DOCS;
-    
+
       shared_ptr<Set::Iterator> dcit = iterators[0];
      target = dcit->Advance(target);
-     if(target == NO_MORE_DOCS) { 
+     if(target == NO_MORE_DOCS) {
        return (lastReturn = target);
      }
-     
+
      int size = iterators.size();
      int skip = 0;
      int i = 1;

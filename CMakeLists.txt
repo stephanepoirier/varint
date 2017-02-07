@@ -18,7 +18,8 @@ set(VARINT_LCOV_OUTPUT_FILE "${CMAKE_BINARY_DIR}/coverage-all.info" CACHE STRING
 set_property(CACHE CMAKE_BUILD_TYPE PROPERTY STRINGS None Debug Release RelWithDebInfo MinSizeRel)
 
 set(SOURCE_DIR  "${PROJECT_SOURCE_DIR}/src")
-set(INCLUDE_DIR "${PROJECT_SOURCE_DIR}/include")
+set(EXTERNAL_DIR  "${PROJECT_SOURCE_DIR}/external")
+set(VARINT_INCLUDE_DIR "${PROJECT_SOURCE_DIR}/include")
 set(INSTALL_INCLUDE_DIR "include")
 set(LIB_NAME ${PROJECT_NAME})
 set(CONFIG_NAME "${LIB_NAME}Config")
@@ -48,23 +49,26 @@ endif()
 status("Configuring library '${LIB_NAME}'")
 
 list(APPEND	SOURCE_FILES
+	"${EXTERNAL_DIR}/bitpacking/simdintegratedbitpacking.c"
+	"${EXTERNAL_DIR}/bitpacking/util.cpp"
 	"${SOURCE_DIR}/CompressedSet.cpp"
 	"${SOURCE_DIR}/CompressedDeltaChunk.cpp"
-	"${SOURCE_DIR}/bitpacking/simdintegratedbitpacking.c"
-	"${SOURCE_DIR}/bitpacking/util.cpp"
 	"${SOURCE_DIR}/LazyAndSet.cpp"
 	"${SOURCE_DIR}/LazyOrSet.cpp"
 	"${SOURCE_DIR}/BasicSet.cpp"
 )
+list(APPEND INCLUDE_DIRS ${VARINT_INCLUDE_DIR} ${EXTERNAL_DIR})
 
 add_library(${LIB_NAME} "${SOURCE_FILES}")
-target_include_directories(${LIB_NAME}
-	PUBLIC
-    $<BUILD_INTERFACE:${SOURCE_DIR}>
-    $<INSTALL_INTERFACE:${INSTALL_INCLUDE_DIR}>
-)
 
-status("Configuring installation instructions")
+foreach(INCLUDE_DIR ${INCLUDE_DIRS})
+	target_include_directories(${LIB_NAME}
+		PUBLIC
+	    $<BUILD_INTERFACE:${INCLUDE_DIR}>
+	    $<INSTALL_INTERFACE:${INSTALL_INCLUDE_DIR}>
+	)
+	install(DIRECTORY "${INCLUDE_DIR}/" DESTINATION ${INSTALL_INCLUDE_DIR} FILES_MATCHING PATTERN "*.h")
+endforeach()
 
 install(
 	TARGETS ${LIB_NAME}
@@ -74,8 +78,6 @@ install(
 	LIBRARY DESTINATION lib
 	INCLUDES DESTINATION ${INSTALL_INCLUDE_DIR}
 )
-# TODO: Rework headers to support private ones and #include prefix
-install(DIRECTORY "${SOURCE_DIR}/" DESTINATION ${INSTALL_INCLUDE_DIR} FILES_MATCHING PATTERN "*.h")
 install(EXPORT ${CONFIG_NAME} DESTINATION "share/${LIB_NAME}/cmake")
 
 export(TARGETS ${LIB_NAME} FILE "${CONFIG_NAME}.cmake")

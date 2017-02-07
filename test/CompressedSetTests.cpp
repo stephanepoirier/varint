@@ -3,9 +3,9 @@
 #include <assert.h>
 #include <iostream>
 
-#include "BasicSet.h"
-#include "CompressedSet.h"
-#include "Set.h"
+#include "varint/BasicSet.h"
+#include "varint/CompressedSet.h"
+#include "varint/Set.h"
 
 using namespace std;
 
