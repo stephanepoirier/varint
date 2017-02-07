@@ -7,46 +7,44 @@
 #include "CompressedSet.h"
 
 class LazyOrSetIterator : public Set::Iterator {
-	private:
-		class Item {
-		  public:
-			shared_ptr<Set::Iterator> iter;
-			unsigned int doc;
-			Item(shared_ptr<Set::Iterator> it){
-				iter = it;
-				doc = 0;
-			}	
-		};
-		unsigned _curDoc;
-		vector<shared_ptr<Item>> _heap;
-		int _size;
-		void heapRemoveRoot();
-		void heapAdjust();
-	public:
-		LazyOrSetIterator(vector<shared_ptr<Set>> sets);
-		unsigned int docID();
-		unsigned int nextDoc();
-		unsigned int Advance(unsigned int target);
+  private:
+  class Item {
+    public:
+    shared_ptr<Set::Iterator> iter;
+    unsigned int doc;
+    Item(shared_ptr<Set::Iterator> it) {
+      iter = it;
+      doc = 0;
+    }
+  };
+  unsigned _curDoc;
+  vector<shared_ptr<Item>> _heap;
+  int _size;
+  void heapRemoveRoot();
+  void heapAdjust();
+
+  public:
+  LazyOrSetIterator(vector<shared_ptr<Set>> sets);
+  unsigned int docID();
+  unsigned int nextDoc();
+  unsigned int Advance(unsigned int target);
 };
 
-class LazyOrSet : public Set 
-{
-	private:
-		const int INVALID = -1;
-		vector<shared_ptr<Set>> sets;
-		mutable int _size = INVALID;
+class LazyOrSet : public Set {
+  private:
+  const int INVALID = -1;
+  vector<shared_ptr<Set>> sets;
+  mutable int _size = INVALID;
 
-	public:
-	
-		LazyOrSet(vector<shared_ptr<Set>> docSets);
-		LazyOrSet(shared_ptr<Set> & left,shared_ptr<Set> & right);
-		shared_ptr<Set::Iterator>  iterator()  const;
-	
-		//Override
-		unsigned int size() const;
-		
-		bool find(unsigned int val) const;
+  public:
+  LazyOrSet(vector<shared_ptr<Set>> docSets);
+  LazyOrSet(shared_ptr<Set>& left, shared_ptr<Set>& right);
+  shared_ptr<Set::Iterator> iterator() const;
+
+  //Override
+  unsigned int size() const;
+
+  bool find(unsigned int val) const;
 };
-	
 
 #endif  //LAZY_OR_SET_H__

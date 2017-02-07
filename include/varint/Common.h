@@ -13,10 +13,10 @@
 #endif
 
 #ifdef _MSC_VER
-typedef unsigned __int8  uint8;
+typedef unsigned __int8 uint8;
 #else
-typedef uint8_t  uint8;
+typedef uint8_t uint8;
 #endif
-typedef char v16qi __attribute__ ((vector_size (16)));
+typedef char v16qi __attribute__((vector_size(16)));
 
 #endif  // COMMON_H__
