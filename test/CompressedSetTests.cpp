@@ -1,4 +1,4 @@
-#include "varint/CompressedSet.h"
+#include "varint/varint.hpp"
 
 #include "gtest/gtest.h"
 
