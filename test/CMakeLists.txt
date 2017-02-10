@@ -11,10 +11,10 @@ project(varint-tests VERSION 0.1)
 status("Configuring test dependencies")
 add_subdirectory("external") # Sets "gtest_SOURCE_DIR", "gtest" and "gtest_main"
 
-file(GLOB_RECURSE TEST_FILENAMES *.cpp)
-list(LENGTH TEST_FILENAMES TEST_FILENAMES_LENGTH)
-status("Tests found: ${TEST_FILENAMES_LENGTH}")
-
+list(APPEND TEST_FILENAMES
+	"CompressedSetTests.cpp"
+	"sanity_check.cpp"
+)
 foreach(TEST_FILENAME ${TEST_FILENAMES})
 	get_filename_component(TEST_NAME ${TEST_FILENAME} NAME_WE)
 	add_executable("${TEST_NAME}" "${TEST_FILENAME}")

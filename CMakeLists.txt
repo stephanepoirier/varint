@@ -51,16 +51,16 @@ status("Configuring library '${LIB_NAME}'")
 list(APPEND	SOURCE_FILES
 	"${EXTERNAL_DIR}/bitpacking/simdintegratedbitpacking.c"
 	"${EXTERNAL_DIR}/bitpacking/util.cpp"
-	"${SOURCE_DIR}/CompressedSet.cpp"
+	"${SOURCE_DIR}/BasicSet.cpp"
 	"${SOURCE_DIR}/CompressedDeltaChunk.cpp"
+	"${SOURCE_DIR}/CompressedSet.cpp"
 	"${SOURCE_DIR}/LazyAndSet.cpp"
 	"${SOURCE_DIR}/LazyOrSet.cpp"
-	"${SOURCE_DIR}/BasicSet.cpp"
 )
-list(APPEND INCLUDE_DIRS ${VARINT_INCLUDE_DIR} ${EXTERNAL_DIR})
 
 add_library(${LIB_NAME} "${SOURCE_FILES}")
 
+list(APPEND INCLUDE_DIRS ${VARINT_INCLUDE_DIR} ${EXTERNAL_DIR})
 foreach(INCLUDE_DIR ${INCLUDE_DIRS})
 	target_include_directories(${LIB_NAME}
 		PUBLIC
@@ -90,11 +90,8 @@ export(TARGETS ${LIB_NAME} FILE "${CONFIG_NAME}.cmake")
 if(VARINT_COVERAGE)
 	status("Coverage analysis is enabled. Configuring coverage.")
   include(CodeCoverage)
-	set_target_properties(${LIB_NAME} PROPERTIES
-		COMPILE_FLAGS "${CMAKE_CXX_FLAGS} --coverage"
-		LINK_FLAGS "--coverage"
-	)
-	target_link_libraries(${LIB_NAME} gcov)
+	target_compile_options(${LIB_NAME} PUBLIC --coverage)
+	target_link_libraries(${LIB_NAME} PUBLIC gcov)
 	setup_target_for_coverage(coverage coverage)
 endif()
 
