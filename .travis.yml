@@ -18,10 +18,9 @@ install:
   - sudo make -C lcov-1.13/ install
   - gem install coveralls-lcov
 script:
-  - mkdir build \
-    && cd build \
-    && cmake -DCMAKE_INSTALL_PREFIX="../install" -DCMAKE_BUILD_TYPE=Debug -DVARINT_TESTS=ON -DVARINT_COVERAGE=ON .. \
-    && make all test coverage install \
-    && cd ..
+  - mkdir build && cd build
+  - cmake -DCMAKE_INSTALL_PREFIX="../install" -DCMAKE_BUILD_TYPE=Debug -DVARINT_TESTS=ON -DVARINT_COVERAGE=ON ..
+  - make all test coverage install
+  - cd ..
 after_success:
   - coveralls-lcov --repo-token ${COVERALLS_TOKEN} ${TRAVIS_BUILD_DIR}/build/coverage-all.info
