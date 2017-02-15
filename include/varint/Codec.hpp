@@ -1,8 +1,8 @@
 #ifndef CODEC_H__
 #define CODEC_H__
 
-#include "CompressedDeltaChunk.h"
-#include "Source.h"
+#include "CompressedDeltaChunk.hpp"
+#include "Source.hpp"
 
 #include "bitpacking/compositecodec.h"
 #include "bitpacking/memutil.h"

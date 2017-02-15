@@ -1,8 +1,8 @@
-#include "varint/CompressedSet.h"
+#include "varint/CompressedSet.hpp"
 
-#include "CollectionHelper.h"
+#include "CollectionHelper.hpp"
 
-#include "varint/Source.h"
+#include "varint/Source.hpp"
 
 #include <assert.h>
 #include <istream>

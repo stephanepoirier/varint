@@ -16,7 +16,7 @@ list(APPEND TEST_FILENAMES
 	"CompressedSetTests.cpp"
 	"LazyAndSetTests.cpp"
 	"LazyOrSetTests.cpp"
-	"sanity_check.cpp"
+	"SanityCheck.cpp"
 )
 foreach(TEST_FILENAME ${TEST_FILENAMES})
 	get_filename_component(TEST_NAME ${TEST_FILENAME} NAME_WE)

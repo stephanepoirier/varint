@@ -4,7 +4,7 @@
 #ifndef SOURCE_H__
 #define SOURCE_H__
 
-#include "Common.h"
+#include "Common.hpp"
 
 static const int kDefaultBlockSize = 8192;
 // A Source is an interface that yields a sequence of bytes.

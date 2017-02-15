@@ -1,6 +1,6 @@
-#include "varint/LazyOrSet.h"
+#include "varint/LazyOrSet.hpp"
 
-#include "varint/Set.h"
+#include "varint/Set.hpp"
 
 #include <memory>
 #include <vector>

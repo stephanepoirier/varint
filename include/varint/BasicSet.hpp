@@ -1,7 +1,7 @@
 #ifndef BASIC_SET_H__
 #define BASIC_SET_H__
 
-#include "Set.h"
+#include "Set.hpp"
 
 #include <istream>
 #include <limits>

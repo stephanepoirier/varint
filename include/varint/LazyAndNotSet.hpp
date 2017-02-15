@@ -1,7 +1,7 @@
 #ifndef LAZY_AND_NOT_SET_H__
 #define LAZY_AND_NOT_SET_H__
 
-#include "Set.h"
+#include "Set.hpp"
 
 #include <memory>
 

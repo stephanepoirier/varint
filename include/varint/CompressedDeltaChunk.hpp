@@ -1,9 +1,9 @@
 #ifndef COMPRESSED_DELTA_CHUNK_H__
 #define COMPRESSED_DELTA_CHUNK_H__
 
-#include "Common.h"
-#include "Sink.h"
-#include "Source.h"
+#include "Common.hpp"
+#include "Sink.hpp"
+#include "Source.hpp"
 
 #include "bitpacking/memutil.h"
 

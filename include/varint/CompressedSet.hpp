@@ -15,10 +15,10 @@
 //BLOCK_INDEX_SHIFT_BITS = i;
 #define BLOCK_INDEX_SHIFT_BITS 11
 
-#include "Codec.h"
-#include "CompressedDeltaChunk.h"
-#include "DeltaChunkStore.h"
-#include "Set.h"
+#include "Codec.hpp"
+#include "CompressedDeltaChunk.hpp"
+#include "DeltaChunkStore.hpp"
+#include "Set.hpp"
 
 #include "bitpacking/memutil.h"
 

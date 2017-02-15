@@ -1,4 +1,4 @@
-#include "varint/BasicSet.h"
+#include "varint/BasicSet.hpp"
 
 #include <assert.h>
 #include <istream>

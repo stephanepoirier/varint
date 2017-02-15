@@ -4,7 +4,7 @@
 #ifndef LAZY_OR_SET_H__
 #define LAZY_OR_SET_H__
 
-#include "Set.h"
+#include "Set.hpp"
 
 #include <memory>
 #include <vector>

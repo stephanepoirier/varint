@@ -1,7 +1,7 @@
 #ifndef DELTA_CHUNK_STORE_H__
 #define DELTA_CHUNK_STORE_H__
 
-#include "CompressedDeltaChunk.h"
+#include "CompressedDeltaChunk.hpp"
 
 #include <istream>
 #include <ostream>

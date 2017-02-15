@@ -1,8 +1,8 @@
-#include "varint/CompressedDeltaChunk.h"
+#include "varint/CompressedDeltaChunk.hpp"
 
-#include "varint/Common.h"
-#include "varint/Sink.h"
-#include "varint/Source.h"
+#include "varint/Common.hpp"
+#include "varint/Sink.hpp"
+#include "varint/Source.hpp"
 
 #include "bitpacking/memutil.h"
 

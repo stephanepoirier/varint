@@ -1,11 +1,11 @@
 #ifndef VARINT_HPP__
 #define VARINT_HPP__
 
-#include "varint/BasicSet.h"
-#include "varint/CompressedSet.h"
-#include "varint/LazyAndNotSet.h"
-#include "varint/LazyAndSet.h"
-#include "varint/LazyOrSet.h"
-#include "varint/Set.h"
+#include "varint/BasicSet.hpp"
+#include "varint/CompressedSet.hpp"
+#include "varint/LazyAndNotSet.hpp"
+#include "varint/LazyAndSet.hpp"
+#include "varint/LazyOrSet.hpp"
+#include "varint/Set.hpp"
 
 #endif  // VARINT_HPP__

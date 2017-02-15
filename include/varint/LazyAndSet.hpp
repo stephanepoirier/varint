@@ -1,7 +1,7 @@
 #ifndef LAZY_AND_SET_H__
 #define LAZY_AND_SET_H__
 
-#include "varint/Set.h"
+#include "varint/Set.hpp"
 
 #include <memory>
 #include <vector>
