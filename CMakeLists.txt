@@ -14,8 +14,11 @@ list(APPEND CMAKE_MODULE_PATH "${PROJECT_SOURCE_DIR}/cmake/modules")
 
 option(VARINT_TESTS "Build tests." ON)
 option(VARINT_COVERAGE "Perform code coverage analysis." ON)
-set(VARINT_LCOV_OUTPUT_FILE "${CMAKE_BINARY_DIR}/coverage-all.info" CACHE STRING "lcov coverage output file.")
-set_property(CACHE CMAKE_BUILD_TYPE PROPERTY STRINGS None Debug Release RelWithDebInfo MinSizeRel)
+
+if(NOT CMAKE_BUILD_TYPE)
+  set(CMAKE_BUILD_TYPE "Debug" CACHE STRING "" FORCE)
+	set_property(CACHE CMAKE_BUILD_TYPE PROPERTY STRINGS None Debug Release RelWithDebInfo MinSizeRel)
+endif(NOT CMAKE_BUILD_TYPE)
 
 set(SOURCE_DIR  "${PROJECT_SOURCE_DIR}/src")
 set(EXTERNAL_DIR  "${PROJECT_SOURCE_DIR}/external")
@@ -92,7 +95,8 @@ if(VARINT_COVERAGE)
   include(CodeCoverage)
 	target_compile_options(${LIB_NAME} PUBLIC --coverage)
 	target_link_libraries(${LIB_NAME} PUBLIC gcov)
-	setup_target_for_coverage(coverage coverage)
+	set(COVERAGE_TARGET_NAME "coverage")
+	setup_target_for_coverage(${COVERAGE_TARGET_NAME})
 endif()
 
 

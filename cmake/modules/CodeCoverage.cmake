@@ -52,10 +52,7 @@
 # 3. Use the function SETUP_TARGET_FOR_COVERAGE to create a custom make target
 #    which runs "make test" and produces a lcov code coverage report:
 #    Example:
-#	 SETUP_TARGET_FOR_COVERAGE(
-#				my_coverage_target  # Name for custom target.
-#				coverage            # Name of output directory.
-#				)
+#	 SETUP_TARGET_FOR_COVERAGE(my_coverage_target)
 #
 # 4. Build a Debug build:
 #	 cmake -DCMAKE_BUILD_TYPE=Debug ..
@@ -87,9 +84,10 @@ ENDIF()
 
 
 # Param _targetname      The name of new the custom make target
-# Param _outputname      lcov output is generated as _outputname.info
-#                        HTML report is generated in _outputname/index.html
-FUNCTION(SETUP_TARGET_FOR_COVERAGE _targetname _outputname)
+#
+# lcov output is generated as coverage.info
+# HTML report is generated in coverage/index.html
+FUNCTION(SETUP_TARGET_FOR_COVERAGE _targetname)
 	IF(NOT LCOV_PATH)
 		MESSAGE(FATAL_ERROR "lcov not found! Aborting...")
 	ENDIF()
@@ -98,10 +96,11 @@ FUNCTION(SETUP_TARGET_FOR_COVERAGE _targetname _outputname)
 		MESSAGE(FATAL_ERROR "genhtml not found! Aborting...")
 	ENDIF()
 
+	SET(_outputname "coverage")
 	SET(initial_info "${CMAKE_BINARY_DIR}/${_outputname}-baseline.info")
 	SET(test_info "${CMAKE_BINARY_DIR}/${_outputname}-tests.info")
-	SET(all_info "${VARINT_LCOV_OUTPUT_FILE}")
-	SET(capture_args --directory . --base-directory '${CMAKE_SOURCE_DIR}' --no-external)
+	SET(all_info "${CMAKE_BINARY_DIR}/${_outputname}-all.info")
+	SET(capture_args --directory . --base-directory '${CMAKE_SOURCE_DIR}' --quiet --no-external)
 
 	# Setup target
 	ADD_CUSTOM_TARGET(${_targetname}
@@ -111,15 +110,15 @@ FUNCTION(SETUP_TARGET_FOR_COVERAGE _targetname _outputname)
 		COMMAND ${LCOV_PATH} --capture --initial ${capture_args} -o ${initial_info}
 
 		# Run tests and capture lcov info
-		COMMAND make test
+		COMMAND ${CMAKE_CTEST_COMMAND} --output-on-failure
 		COMMAND ${LCOV_PATH} --capture ${capture_args} -o ${test_info}
 
 		# Merge baseline and test coverage info
-		COMMAND ${LCOV_PATH} -a ${initial_info} -a ${test_info} -o ${all_info}
+		COMMAND ${LCOV_PATH} -a ${initial_info} -a ${test_info} -o ${all_info} --quiet
 
-		COMMAND ${LCOV_PATH} --extract ${all_info} '${CMAKE_SOURCE_DIR}/src/*' '${CMAKE_SOURCE_DIR}/include/*' -o ${all_info}
+		COMMAND ${LCOV_PATH} --extract ${all_info} '${CMAKE_SOURCE_DIR}/src/*' '${CMAKE_SOURCE_DIR}/include/*' -o ${all_info} --quiet
 
-		COMMAND ${GENHTML_PATH} -o ${_outputname} ${all_info} # Generate HTML
+		COMMAND ${GENHTML_PATH} --quiet -o ${_outputname} ${all_info} # Generate HTML
 
 		# Cleanup intermediate files
 		COMMAND ${CMAKE_COMMAND} -E remove ${initial_info} ${test_info}
