@@ -12,7 +12,10 @@ status("Configuring test dependencies")
 add_subdirectory("external") # Sets "gtest_SOURCE_DIR", "gtest" and "gtest_main"
 
 list(APPEND TEST_FILENAMES
+	"CompressedDeltaChunkTests.cpp"
 	"CompressedSetTests.cpp"
+	"LazyAndSetTests.cpp"
+	"LazyOrSetTests.cpp"
 	"sanity_check.cpp"
 )
 foreach(TEST_FILENAME ${TEST_FILENAMES})
