@@ -60,7 +60,7 @@ list(APPEND	SOURCE_FILES
 add_library(${LIB_NAME} "${SOURCE_FILES}")
 
 # Sets C++ standard >= C++11 to current project and those that import it
-target_compile_features(${LIB_NAME} PUBLIC cxx_decltype_auto)
+target_compile_features(${LIB_NAME} PUBLIC cxx_nonstatic_member_init)
 
 list(APPEND INCLUDE_DIRS ${VARINT_INCLUDE_DIR} ${EXTERNAL_DIR})
 foreach(INCLUDE_DIR ${INCLUDE_DIRS})
