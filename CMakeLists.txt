@@ -28,6 +28,9 @@ set(LIB_NAME ${PROJECT_NAME})
 ################################################################################
 
 set(CMAKE_C_COMPILE_OBJECT "${CMAKE_CXX_COMPILE_OBJECT}") #Compile C as CXX
+set(CMAKE_CXX_STANDARD 11) # C++11 required
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+set(CMAKE_CXX_EXTENSIONS OFF) # Disable compiler-specific extensions
 
 if(CMAKE_COMPILER_IS_GNUCXX OR CYGWIN OR APPLE OR MINGW)
 	add_definitions(-Wall -pedantic) #Warning level
