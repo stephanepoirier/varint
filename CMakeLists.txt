@@ -10,30 +10,24 @@ cmake_minimum_required(VERSION 3.2 FATAL_ERROR)
 project(varint VERSION 0.1 LANGUAGES CXX)
 
 include("${PROJECT_SOURCE_DIR}/cmake/utils.cmake")
+
 list(APPEND CMAKE_MODULE_PATH "${PROJECT_SOURCE_DIR}/cmake/modules")
 
-option(VARINT_TESTS "Build tests." ON)
+set(VARINT_TESTS_OPTION_MSG "Build tests.")
+option(VARINT_TESTS "${VARINT_TESTS_OPTION_MSG}" ON)
 option(VARINT_COVERAGE "Perform code coverage analysis." ON)
 
-if(NOT CMAKE_BUILD_TYPE)
-  set(CMAKE_BUILD_TYPE "Debug" CACHE STRING "" FORCE)
-	set_property(CACHE CMAKE_BUILD_TYPE PROPERTY STRINGS None Debug Release RelWithDebInfo MinSizeRel)
-endif(NOT CMAKE_BUILD_TYPE)
-
-set(SOURCE_DIR  "${PROJECT_SOURCE_DIR}/src")
-set(EXTERNAL_DIR  "${PROJECT_SOURCE_DIR}/external")
+set(SOURCE_DIR "${PROJECT_SOURCE_DIR}/src")
+set(EXTERNAL_DIR "${PROJECT_SOURCE_DIR}/external")
 set(VARINT_INCLUDE_DIR "${PROJECT_SOURCE_DIR}/include")
 set(INSTALL_INCLUDE_DIR "include")
 set(LIB_NAME ${PROJECT_NAME})
-set(CONFIG_NAME "${LIB_NAME}Config")
-
 
 ################################################################################
 #                        General compilation flags                             #
 ################################################################################
 
 set(CMAKE_C_COMPILE_OBJECT "${CMAKE_CXX_COMPILE_OBJECT}") #Compile C as CXX
-set(CMAKE_CXX_STANDARD 11) #C++11 required
 
 if(CMAKE_COMPILER_IS_GNUCXX OR CYGWIN OR APPLE OR MINGW)
 	add_definitions(-Wall -pedantic) #Warning level
@@ -44,7 +38,6 @@ elseif(MSVC)
 else()
 	message(WARNING "Unknown build tool. Compilation flags are not configured.")
 endif()
-
 
 ################################################################################
 #                           Library configuration                              #
@@ -63,6 +56,9 @@ list(APPEND	SOURCE_FILES
 
 add_library(${LIB_NAME} "${SOURCE_FILES}")
 
+# Sets C++ standard >= C++11 to current project and those that import it
+target_compile_features(${LIB_NAME} PUBLIC cxx_decltype_auto)
+
 list(APPEND INCLUDE_DIRS ${VARINT_INCLUDE_DIR} ${EXTERNAL_DIR})
 foreach(INCLUDE_DIR ${INCLUDE_DIRS})
 	target_include_directories(${LIB_NAME}
@@ -70,9 +66,15 @@ foreach(INCLUDE_DIR ${INCLUDE_DIRS})
 	    $<BUILD_INTERFACE:${INCLUDE_DIR}>
 	    $<INSTALL_INTERFACE:${INSTALL_INCLUDE_DIR}>
 	)
-	install(DIRECTORY "${INCLUDE_DIR}/" DESTINATION ${INSTALL_INCLUDE_DIR} FILES_MATCHING PATTERN "*.h")
+	install(
+    DIRECTORY "${INCLUDE_DIR}/" DESTINATION ${INSTALL_INCLUDE_DIR}
+    FILES_MATCHING
+      PATTERN "*.h*"
+      PATTERN ".hpp"
+  )
 endforeach()
 
+set(CONFIG_NAME "${LIB_NAME}Config")
 install(
 	TARGETS ${LIB_NAME}
 	EXPORT ${CONFIG_NAME}
@@ -82,9 +84,8 @@ install(
 	INCLUDES DESTINATION ${INSTALL_INCLUDE_DIR}
 )
 install(EXPORT ${CONFIG_NAME} DESTINATION "share/${LIB_NAME}/cmake")
-
 export(TARGETS ${LIB_NAME} FILE "${CONFIG_NAME}.cmake")
-
+export(PACKAGE ${PROJECT_NAME})
 
 ################################################################################
 #                           Coverage analysis setup                            #
@@ -92,13 +93,16 @@ export(TARGETS ${LIB_NAME} FILE "${CONFIG_NAME}.cmake")
 
 if(VARINT_COVERAGE)
 	status("Coverage analysis is enabled. Configuring coverage.")
+	if (NOT VARINT_TESTS)
+		message(WARNING "Coverage depends on tests. Enabling tests.")
+		set(VARINT_TESTS ON CACHE BOOL "${VARINT_TESTS_OPTION_MSG}" FORCE) # Tests are required for coverage
+	endif()
+
   include(CodeCoverage)
 	target_compile_options(${LIB_NAME} PUBLIC --coverage)
 	target_link_libraries(${LIB_NAME} PUBLIC gcov)
-	set(COVERAGE_TARGET_NAME "coverage")
-	setup_target_for_coverage(${COVERAGE_TARGET_NAME})
+	setup_target_for_coverage("coverage")
 endif()
-
 
 ################################################################################
 #                                Tests setup                                   #

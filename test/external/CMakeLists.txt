@@ -50,3 +50,7 @@ execute_process(
 
 set(GTEST_SRC_DIR "${GTEST_TMP_DIR}/googletest-${GTEST_VERSION}")
 add_subdirectory("${GTEST_SRC_DIR}" ${GTEST_BIN_DIR})
+mark_as_advanced(
+	gtest_build_tests
+	gtest_build_samples
+)

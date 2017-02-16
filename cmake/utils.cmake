@@ -6,5 +6,5 @@
 ################################################################################
 
 function(status TEXT)
-	message(STATUS "[INFO] ${TEXT}")
+	message(STATUS "${TEXT}")
 endfunction()
