@@ -1,21 +1,25 @@
 dist: trusty
+sudo: false
 language: cpp
-addons:
-  apt:
-    sources:
-      - george-edison55/cmake-3.x
-    packages:
-      - cmake
 compiler:
   - gcc
-before_install:
-  - sudo apt-get -qq update
-  - sudo apt-get install -y lcov
+env:
+  - global:
+    - APPS_DIR=$HOME/apps
+    - LCOV_ROOT_DIR=${APPS_DIR}/lcov
+    - CMAKE_ROOT_DIR=${APPS_DIR}/cmake
 install:
-  # install latest LCOV >= 1.12
-  - wget https://github.com/linux-test-project/lcov/releases/download/v1.13/lcov-1.13.tar.gz
-  - tar xf lcov-1.13.tar.gz
-  - sudo make -C lcov-1.13/ install
+  # LCOV
+  - mkdir -p "${LCOV_ROOT_DIR}"
+  - wget https://github.com/linux-test-project/lcov/releases/download/v1.13/lcov-1.13.tar.gz -O "${LCOV_ROOT_DIR}/lcov.tar.gz"
+  - tar xf "${LCOV_ROOT_DIR}/lcov.tar.gz" -C "${LCOV_ROOT_DIR}" --strip-components 1
+  - export PATH="${LCOV_ROOT_DIR}/bin:$PATH"
+  # CMake
+  - mkdir -p "${CMAKE_ROOT_DIR}"
+  - wget https://cmake.org/files/v3.2/cmake-3.2.3-Linux-x86_64.tar.gz -O "${CMAKE_ROOT_DIR}/cmake.tar.gz"
+  - tar xf "${CMAKE_ROOT_DIR}/cmake.tar.gz" -C "${CMAKE_ROOT_DIR}" --strip-components 1
+  - export PATH="${CMAKE_ROOT_DIR}/bin:$PATH"
+  # Coveralls-LCOV
   - gem install coveralls-lcov
 script:
   - mkdir build && cd build
