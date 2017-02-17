@@ -1,3 +1,9 @@
+/**
+ * @file CompressedSetTests.cpp
+ *
+ * Tests for the CompressedSet class.
+ */
+
 #include "varint/varint.hpp"
 
 #include "gtest/gtest.h"
@@ -27,6 +33,9 @@ void testvec(std::set<unsigned int>& data) {
   ASSERT_TRUE(it2.nextDoc() == NO_MORE_DOCS);
 }
 
+/**
+ * @test General CompressedSet test.
+ */
 TEST(CompressedSetTests, GeneralTest) {
   for (uint32_t b = 0; b <= 28; ++b) {
     std::cout << "testing1... b = " << b << std::endl;

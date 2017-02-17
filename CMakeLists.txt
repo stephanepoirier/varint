@@ -16,6 +16,7 @@ list(APPEND CMAKE_MODULE_PATH "${PROJECT_SOURCE_DIR}/cmake/modules")
 set(VARINT_TESTS_OPTION_MSG "Build tests.")
 option(VARINT_TESTS "${VARINT_TESTS_OPTION_MSG}" ON)
 option(VARINT_COVERAGE "Perform code coverage analysis." OFF)
+option(VARINT_GENERATE_DOCS "Generate documentation (doc) target (requires Doxygen)" OFF)
 
 set(SOURCE_DIR "${PROJECT_SOURCE_DIR}/src")
 set(EXTERNAL_DIR "${PROJECT_SOURCE_DIR}/external")
@@ -105,6 +106,28 @@ if(VARINT_COVERAGE)
 	target_compile_options(${LIB_NAME} PUBLIC --coverage)
 	target_link_libraries(${LIB_NAME} PUBLIC gcov)
 	setup_target_for_coverage("coverage")
+endif()
+
+################################################################################
+#                                Doxygen setup                                 #
+################################################################################
+
+if (VARINT_GENERATE_DOCS)
+	find_package(Doxygen REQUIRED)
+	set(DOXYFILE_IN "${CMAKE_CURRENT_SOURCE_DIR}/doc/Doxyfile.in")
+	set(DOXYFILE "${CMAKE_CURRENT_BINARY_DIR}/doc/Doxyfile")
+	set(DOC_OUTPUT_DIR "${CMAKE_CURRENT_BINARY_DIR}/doc")
+
+	configure_file("${DOXYFILE_IN}" "${DOXYFILE}" @ONLY)
+	add_custom_target(create_doc_dir COMMAND ${CMAKE_COMMAND} -E make_directory ${DOC_OUTPUT_DIR})
+	add_custom_target(
+	  doc
+		DEPENDS create_doc_dir
+	  COMMAND ${DOXYGEN_EXECUTABLE} "${DOXYFILE}"
+	  WORKING_DIRECTORY ${DOC_OUTPUT_DIR}
+	  COMMENT "Generating API documentation with Doxygen to: '${DOC_OUTPUT_DIR}'"
+	  VERBATIM
+	)
 endif()
 
 ################################################################################

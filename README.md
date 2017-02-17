@@ -73,6 +73,10 @@ This will make varint's include directories and library available to your target
 varint's include directory and library file are located at the root of your installation directory.
 
 
+## Documentation
+
+Generate the API documentation using `make doc` (requires [Doxygen](www.doxygen.org/)).
+
 ## Contact
 
 General:
