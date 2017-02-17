@@ -1,7 +1,7 @@
 # varint: Inverted Index Compression Library
 
 [![Build Status](https://secure.travis-ci.org/stephanepoirier/varint.png?branch=master)](https://travis-ci.org/stephanepoirier/varint)
-[![Coverage Status](https://coveralls.io/repos/github/stephanepoirier/varint/badge.svg?branch=master)](https://coveralls.io/github/stephanepoirier/varint?branch=coverage)
+[![Coverage Status](https://coveralls.io/repos/github/stephanepoirier/varint/badge.svg?branch=master)](https://coveralls.io/github/stephanepoirier/varint?branch=master)
 
 
 ## Description
@@ -31,16 +31,12 @@ mkdir varint && cd varint
 git clone https://github.com/stephanepoirier/varint.git .
 ```
 
-Build the library and run tests:
+Build, test and install the library:
 ```Bash
 mkdir build && cd build
 cmake -DCMAKE_BUILD_TYPE=Release ..
-make all test
-```
 
-Install the library:
-```Bash
-make install
+make all test install
 ```
 
 Next, [integrate](#integration) varint into your project.
@@ -75,7 +71,10 @@ varint's include directory and library file are located at the root of your inst
 
 ## Documentation
 
-Generate the API documentation using `make doc` (requires [Doxygen](www.doxygen.org/)).
+See the [online API documentation](https://stephanepoirier.github.io/varint/docs).
+
+For the latest version, generate the API documentation using `make doc` (requires [Doxygen](www.doxygen.org/)).
+
 
 ## Contact
 
