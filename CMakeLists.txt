@@ -15,7 +15,7 @@ list(APPEND CMAKE_MODULE_PATH "${PROJECT_SOURCE_DIR}/cmake/modules")
 
 set(VARINT_TESTS_OPTION_MSG "Build tests.")
 option(VARINT_TESTS "${VARINT_TESTS_OPTION_MSG}" ON)
-option(VARINT_COVERAGE "Perform code coverage analysis." ON)
+option(VARINT_COVERAGE "Perform code coverage analysis." OFF)
 
 set(SOURCE_DIR "${PROJECT_SOURCE_DIR}/src")
 set(EXTERNAL_DIR "${PROJECT_SOURCE_DIR}/external")
