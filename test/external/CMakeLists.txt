@@ -10,9 +10,9 @@ project(varint-tests-external VERSION 0.1)
 
 status("Importing Google Test")
 
-set(GTEST_VERSION "release-1.7.0")
+set(GTEST_VERSION "release-1.8.0")
 set(GTEST_ARCHIVE_URL "https://github.com/google/googletest/archive/${GTEST_VERSION}.zip")
-set(GTEST_ARCHIVE_SHA1 "f89bc9f55477df2fde082481e2d709bfafdb057b")
+set(GTEST_ARCHIVE_SHA1 "667f873ab7a4d246062565fad32fb6d8e203ee73")
 
 set(GTEST_PROJECT_NAME "gtest-tmp")
 set(GTEST_ROOT_DIR "${CMAKE_CURRENT_BINARY_DIR}/${GTEST_PROJECT_NAME}")

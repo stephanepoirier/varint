@@ -23,7 +23,7 @@ install:
   - gem install coveralls-lcov
 script:
   - mkdir build && cd build
-  - cmake -DCMAKE_INSTALL_PREFIX="../install" -DCMAKE_BUILD_TYPE=Debug -DVARINT_TESTS=ON -DVARINT_COVERAGE=ON ..
+  - cmake -DCMAKE_INSTALL_PREFIX="../install" -DCMAKE_BUILD_TYPE=Debug -DBUILD_GTEST=ON -DVARINT_TESTS=ON -DVARINT_COVERAGE=ON ..
   - make all coverage install
   - cd ..
 after_success:
