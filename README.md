@@ -1,6 +1,7 @@
 # varint: Inverted Index Compression Library
 
 [![Build Status](https://secure.travis-ci.org/stephanepoirier/varint.png?branch=master)](https://travis-ci.org/stephanepoirier/varint)
+[![Build status](https://ci.appveyor.com/api/projects/status/ecovhm1nsc78blmd/branch/master?svg=true)](https://ci.appveyor.com/project/stephanepoirier/varint/branch/master)
 [![Coverage Status](https://coveralls.io/repos/github/stephanepoirier/varint/badge.svg?branch=master)](https://coveralls.io/github/stephanepoirier/varint?branch=master)
 
 

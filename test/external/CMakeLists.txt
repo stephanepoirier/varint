@@ -10,9 +10,11 @@ project(varint-tests-external VERSION 0.1)
 
 status("Importing Google Test")
 
-set(GTEST_VERSION "release-1.8.0")
+# Due to GoogleTest issue #606 (https://github.com/google/googletest/issues/606),
+# we have to use a recent non-release snapshot (51143d5b). Test with 1.9.0 when it goes online.
+set(GTEST_VERSION "51143d5b62521f71020ada4ba1b6b44f3a6749bb")
 set(GTEST_ARCHIVE_URL "https://github.com/google/googletest/archive/${GTEST_VERSION}.zip")
-set(GTEST_ARCHIVE_SHA1 "667f873ab7a4d246062565fad32fb6d8e203ee73")
+set(GTEST_ARCHIVE_SHA1 "db8325d5308e0b29ff4eb104f386ada134fc4e4d")
 
 set(GTEST_PROJECT_NAME "gtest-tmp")
 set(GTEST_ROOT_DIR "${CMAKE_CURRENT_BINARY_DIR}/${GTEST_PROJECT_NAME}")
