@@ -1,12 +1,16 @@
-dist: trusty
-sudo: false
 language: cpp
 matrix:
   include:
-  - compiler: gcc
+  - os: linux
+    dist: trusty
+    sudo: false
+    compiler: gcc
     env: ENABLE_COVERAGE=true
-  - compiler: clang
-    env: ENABLE_COVERAGE=false
+  - os: linux
+    dist: trusty
+    sudo: false
+    compiler: clang
+  - os: osx
 before_install:
   - export APPS_DIR=${HOME}/apps
   - export LCOV_ROOT_DIR=${APPS_DIR}/lcov
