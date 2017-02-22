@@ -1,30 +1,20 @@
 dist: trusty
 sudo: false
 language: cpp
-compiler:
-  - gcc
-env:
-  - global:
-    - APPS_DIR=$HOME/apps
-    - LCOV_ROOT_DIR=${APPS_DIR}/lcov
-    - CMAKE_ROOT_DIR=${APPS_DIR}/cmake
-install:
-  # LCOV
-  - mkdir -p "${LCOV_ROOT_DIR}"
-  - wget https://github.com/linux-test-project/lcov/releases/download/v1.13/lcov-1.13.tar.gz -O "${LCOV_ROOT_DIR}/lcov.tar.gz"
-  - tar xf "${LCOV_ROOT_DIR}/lcov.tar.gz" -C "${LCOV_ROOT_DIR}" --strip-components 1
-  - export PATH="${LCOV_ROOT_DIR}/bin:$PATH"
-  # CMake
-  - mkdir -p "${CMAKE_ROOT_DIR}"
-  - wget https://cmake.org/files/v3.2/cmake-3.2.3-Linux-x86_64.tar.gz -O "${CMAKE_ROOT_DIR}/cmake.tar.gz"
-  - tar xf "${CMAKE_ROOT_DIR}/cmake.tar.gz" -C "${CMAKE_ROOT_DIR}" --strip-components 1
+matrix:
+  include:
+  - compiler: gcc
+    env: ENABLE_COVERAGE=true
+  - compiler: clang
+    env: ENABLE_COVERAGE=false
+before_install:
+  - export APPS_DIR=${HOME}/apps
+  - export LCOV_ROOT_DIR=${APPS_DIR}/lcov
+  - export CMAKE_ROOT_DIR=${APPS_DIR}/cmake
+install: ./.travis/install.sh
+before_script:
   - export PATH="${CMAKE_ROOT_DIR}/bin:$PATH"
-  # Coveralls-LCOV
-  - gem install coveralls-lcov
-script:
-  - mkdir build && cd build
-  - cmake -DCMAKE_INSTALL_PREFIX="../install" -DCMAKE_BUILD_TYPE=Debug -DBUILD_GTEST=ON -DVARINT_TESTS=ON -DVARINT_COVERAGE=ON ..
-  - make all coverage install
-  - cd ..
+  - export PATH="${LCOV_ROOT_DIR}/bin:$PATH"
+script: ./.travis/run-script.sh
 after_success:
-  - coveralls-lcov --repo-token ${COVERALLS_TOKEN} ${TRAVIS_BUILD_DIR}/build/coverage-all.info
+  - if [ "${ENABLE_COVERAGE}" = true ]; then coveralls-lcov --repo-token ${COVERALLS_TOKEN} ${TRAVIS_BUILD_DIR}/build/coverage-all.info; fi
