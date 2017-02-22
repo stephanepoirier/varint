@@ -12,7 +12,7 @@ configuration: Debug
 before_build:
   - ps: $env:PATH="C:\msys64\mingw64\bin;C:\msys64\usr\bin;$env:PATH"
   - mkdir build && cd build
-  - cmake -DCMAKE_INSTALL_PREFIX="../install" -DCMAKE_BUILD_TYPE=%CONFIGURATION% -G "MSYS Makefiles" -DBUILD_GTEST=ON -DVARINT_TESTS=ON -DVARINT_COVERAGE=OFF ..
+  - cmake -DCMAKE_INSTALL_PREFIX="../install" -DCMAKE_BUILD_TYPE=%CONFIGURATION% -G "MSYS Makefiles" -DBUILD_GTEST=ON -DBUILD_GMOCK=OFF -DVARINT_TESTS=ON -DVARINT_COVERAGE=OFF ..
 
 build_script: make all install
 
